@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vantop · Panel de trabajo</title>
+  <base href="/vantop-dashboard/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="static/style.css" />
+</head>
+<body>
+
+  <!-- Barra superior -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">Vantop</span>
+      <span class="topbar-sep">·</span>
+      <span class="topbar-titulo">Panel de trabajo</span>
+    </div>
+    <div class="topbar-right">
+      <a id="oauth-chip" href="/auth" class="oauth-chip oauth-chip--cargando" title="Estado de conexión Google">
+        <span class="oauth-dot"></span>
+        <span class="oauth-label">Conectando…</span>
+      </a>
+      <span id="fecha-actual" class="topbar-fecha"></span>
+      <span id="hora-actual" class="topbar-hora"></span>
+      <span id="ultima-actualizacion" class="topbar-update"></span>
+    </div>
+  </header>
+
+  <!-- Bloque resumen del día -->
+  <section class="resumen-section">
+    <div class="metricas-grid">
+      <div class="metrica-card" id="card-servicios">
+        <div class="metrica-label">Servicios hoy</div>
+        <div class="metrica-valor" id="m-servicios">—</div>
+      </div>
+      <div class="metrica-card" id="card-proximo">
+        <div class="metrica-label">Próximo servicio</div>
+        <div class="metrica-valor" id="m-proximo">—</div>
+      </div>
+      <div class="metrica-card" id="card-ingresos">
+        <div class="metrica-label">Ingresos del día</div>
+        <div class="metrica-valor" id="m-ingresos">—</div>
+      </div>
+      <div class="metrica-card" id="card-leads">
+        <div class="metrica-label">Leads pendientes</div>
+        <div class="metrica-valor" id="m-leads">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navegación de secciones -->
+  <nav class="tabs-nav">
+    <button class="tab-btn active" data-seccion="clientes">Clientes</button>
+    <button class="tab-btn" data-seccion="calendario">Calendario</button>
+    <button class="tab-btn" data-seccion="finanzas">Finanzas</button>
+  </nav>
+
+  <!-- Contenedor principal -->
+  <main class="contenido">
+
+    <!-- Sección Clientes -->
+    <section id="sec-clientes" class="seccion activa">
+      <div class="seccion-header">
+        <h2>Clientes</h2>
+        <div class="seccion-acciones">
+          <input type="text" id="filtro-clientes" class="input-filtro" placeholder="Buscar cliente..." />
+          <button class="btn-primario" id="btn-agregar-cliente">+ Agregar cliente</button>
+        </div>
+      </div>
+
+      <!-- Formulario inline nuevo cliente -->
+      <div id="form-cliente" class="form-inline oculto">
+        <h3>Nuevo cliente</h3>
+        <div class="form-grid">
+          <label>
+            Nombre
+            <input type="text" id="fc-nombre" placeholder="Nombre del cliente" />
+          </label>
+          <label>
+            Teléfono
+            <input type="text" id="fc-telefono" placeholder="+56 9 XXXX XXXX" />
+          </label>
+          <label>
+            Fecha del viaje
+            <input type="date" id="fc-fecha" />
+          </label>
+          <label>
+            Ruta
+            <input type="text" id="fc-ruta" placeholder="Aeropuerto → Las Condes" />
+          </label>
+          <label>
+            Monto ($)
+            <input type="number" id="fc-monto" placeholder="95000" />
+          </label>
+          <label>
+            Estado
+            <select id="fc-estado">
+              <option value="Cotizado">Cotizado</option>
+              <option value="Confirmado">Confirmado</option>
+              <option value="Realizado">Realizado</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-botones">
+          <button class="btn-primario" id="btn-guardar-cliente">Guardar</button>
+          <button class="btn-secundario" id="btn-cancelar-cliente">Cancelar</button>
+        </div>
+        <p id="msg-cliente" class="msg-formulario"></p>
+      </div>
+
+      <div class="tabla-wrapper">
+        <div id="cargando-clientes" class="cargando">Cargando clientes...</div>
+        <table id="tabla-clientes" class="tabla oculto">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Último servicio</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-clientes"></tbody>
+        </table>
+        <p id="sin-clientes" class="texto-vacio oculto">No hay clientes registrados.</p>
+      </div>
+    </section>
+
+    <!-- Sección Calendario -->
+    <section id="sec-calendario" class="seccion">
+      <div class="seccion-header">
+        <h2>Calendario</h2>
+        <a href="https://calendar.google.com" target="_blank" class="btn-secundario">
+          + Agregar servicio
+        </a>
+      </div>
+
+      <div id="cargando-calendario" class="cargando">Cargando calendario...</div>
+
+      <div id="contenido-calendario" class="oculto">
+        <div class="cal-columnas">
+          <div class="cal-columna">
+            <h3 class="cal-dia-titulo">Hoy</h3>
+            <div id="eventos-hoy"></div>
+          </div>
+          <div class="cal-columna">
+            <h3 class="cal-dia-titulo">Mañana</h3>
+            <div id="eventos-manana"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección Finanzas -->
+    <section id="sec-finanzas" class="seccion">
+      <div class="seccion-header">
+        <h2>Finanzas</h2>
+        <button class="btn-primario" id="btn-agregar-gasto">+ Registrar gasto</button>
+      </div>
+
+      <!-- Formulario inline nuevo gasto -->
+      <div id="form-gasto" class="form-inline oculto">
+        <h3>Nuevo gasto</h3>
+        <div class="form-grid">
+          <label>
+            Fecha
+            <input type="date" id="fg-fecha" />
+          </label>
+          <label>
+            Categoría
+            <select id="fg-categoria">
+              <option value="Bencina">Bencina</option>
+              <option value="Peaje">Peaje</option>
+              <option value="Lavado">Lavado</option>
+              <option value="Mantención">Mantención</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </label>
+          <label>
+            Monto ($)
+            <input type="number" id="fg-monto" placeholder="15000" />
+          </label>
+          <label>
+            Descripción
+            <input type="text" id="fg-descripcion" placeholder="Descripción opcional" />
+          </label>
+        </div>
+        <div class="form-botones">
+          <button class="btn-primario" id="btn-guardar-gasto">Guardar</button>
+          <button class="btn-secundario" id="btn-cancelar-gasto">Cancelar</button>
+        </div>
+        <p id="msg-gasto" class="msg-formulario"></p>
+      </div>
+
+      <div id="cargando-finanzas" class="cargando">Cargando finanzas...</div>
+
+      <div id="contenido-finanzas" class="oculto">
+        <div class="finanzas-resumen">
+          <div class="metrica-card verde">
+            <div class="metrica-label">Ingresos del mes</div>
+            <div class="metrica-valor" id="f-ingresos">—</div>
+          </div>
+          <div class="metrica-card rojo">
+            <div class="metrica-label">Gastos del mes</div>
+            <div class="metrica-valor" id="f-gastos">—</div>
+          </div>
+          <div class="metrica-card" id="card-margen">
+            <div class="metrica-label">Margen estimado</div>
+            <div class="metrica-valor" id="f-margen">—</div>
+          </div>
+        </div>
+
+        <h3 class="subtitulo-seccion">Últimos gastos</h3>
+        <div class="tabla-wrapper">
+          <table class="tabla" id="tabla-gastos">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Categoría</th>
+                <th>Monto</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-gastos"></tbody>
+          </table>
+          <p id="sin-gastos" class="texto-vacio oculto">No hay gastos registrados este mes.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="static/app.js"></script>
+</body>
+</html>
