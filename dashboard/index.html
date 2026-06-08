@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Home Lettuce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        },
+        colors: {
+          paper: {
+            DEFAULT: '#fbfbf8',
+            soft: '#f4f4ef',
+            card: '#ffffff',
+          },
+          ink: {
+            DEFAULT: '#1f2421',
+            soft: '#525853',
+            mute: '#8b9089',
+          },
+          night: {
+            DEFAULT: '#16191a',
+            soft: '#1d2122',
+            card: '#23282a',
+            line: '#2c3133',
+            text: '#e7e9e6',
+            softText: '#9aa19c',
+          },
+        },
+        boxShadow: {
+          subtle: '0 1px 2px rgba(20,28,24,.04), 0 1px 1px rgba(20,28,24,.02)',
+        },
+      }
+    }
+  }
+</script>
+<style>
+  :root {
+    --accent: 153 72% 76%;
+    --accent-strong: 153 38% 42%;
+    --accent-tint: 153 70% 95%;
+  }
+  .palette-sage    { --accent: 150 38% 76%; --accent-strong: 152 30% 38%; --accent-tint: 150 50% 95%; }
+  .palette-lavender{ --accent: 265 45% 82%; --accent-strong: 263 32% 50%; --accent-tint: 265 55% 96%; }
+  .palette-peach   { --accent:  22 78% 84%; --accent-strong:  20 55% 50%; --accent-tint:  22 80% 96%; }
+
+  .dark.palette-sage    { --accent: 150 40% 70%; --accent-strong: 150 38% 64%; --accent-tint: 150 25% 22%; }
+  .dark.palette-lavender{ --accent: 265 50% 78%; --accent-strong: 265 45% 75%; --accent-tint: 265 25% 24%; }
+  .dark.palette-peach   { --accent:  22 78% 78%; --accent-strong:  20 70% 72%; --accent-tint:  22 35% 22%; }
+
+  html, body, #root { height: 100%; }
+  body {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background: #fbfbf8;
+    color: #1f2421;
+  }
+  .dark body { background: #16191a; color: #e7e9e6; }
+  body { background: transparent; }
+
+  .bg-accent      { background-color: hsl(var(--accent)); }
+  .bg-accent-tint { background-color: hsl(var(--accent-tint)); }
+  .text-accent    { color: hsl(var(--accent-strong)); }
+  .ring-accent    { --tw-ring-color: hsl(var(--accent)); }
+  .border-accent  { border-color: hsl(var(--accent)); }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,.08); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+  .dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); background-clip: content-box; border: 2px solid transparent; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.18); background-clip: content-box; border: 2px solid transparent; }
+
+  .route-fade { animation: rf .35s ease both; }
+  @keyframes rf { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform:none; } }
+
+  @keyframes hlSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes hlFade    { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes hlPop     { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+  .hl-anim-fade  { animation: hlFade .2s ease; }
+  .hl-anim-pop   { animation: hlPop .18s ease; }
+  .hl-anim-sheet { animation: hlSheetUp .3s cubic-bezier(.32,.72,0,1); }
+  .hl-modal-anim { animation: hlSheetUp .3s cubic-bezier(.32,.72,0,1); }
+  @media (min-width: 640px) { .hl-modal-anim { animation: hlPop .18s ease; } }
+  @media (prefers-reduced-motion: reduce) {
+    .route-fade, .hl-anim-fade, .hl-anim-pop, .hl-anim-sheet, .hl-modal-anim { animation: none !important; }
+  }
+
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid hsl(var(--accent-strong)); outline-offset: 2px; border-radius: 12px; }
+
+  [data-tweaks-host] { --dc-inv-zoom: 1; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="store.jsx"></script>
+<script type="text/babel" src="pages.jsx"></script>
+<script type="text/babel" src="cine.jsx"></script>
+<script type="text/babel" src="calendar.jsx"></script>
+<script type="text/babel" src="calendar-mobile.jsx"></script>
+<script type="text/babel" src="habitos.jsx"></script>
+<script type="text/babel" src="finanzas.jsx"></script>
+<script type="text/babel" src="alimentacion.jsx"></script>
+<script type="text/babel" src="salud.jsx"></script>
+<script type="text/babel" src="alimentacion-general.jsx"></script>
+<script type="text/babel" src="recetas.jsx"></script>
+<script type="text/babel" src="tareas.jsx"></script>
+<script type="text/babel" src="proyectos.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+</body>
+</html>
