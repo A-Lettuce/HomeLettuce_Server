@@ -2322,40 +2322,631 @@ function MiFamiliaSection({ subfamilyId, data }) {
 }
 
 
-// ─── persistencia del usuario activo (Phase 1) ──────────────────────────────
-const FIN_ACTIVE_USER_KEY = 'hl.fin.activeUser';
-function finReadActiveUser() {
-  try {
-    const v = localStorage.getItem(FIN_ACTIVE_USER_KEY);
-    if (v && FIN_USER_SUBFAMILY[v]) return v;
-  } catch (_) {}
-  return 'u-andreu';
+// ─── datos mock nueva arquitectura ──────────────────────────────────────────
+const FAMILIAS = {
+  A: {
+    nombre: "Familia A",
+    miembros: [
+      { id: "mama",    inicial: "M", nombre: "Mamá",    color: "#F4C0D1", textColor: "#72243E" },
+      { id: "hermano", inicial: "H", nombre: "Hermano", color: "#C0DD97", textColor: "#27500A" },
+      { id: "andreu",  inicial: "A", nombre: "Andreu",  color: "#B5D4F4", textColor: "#0C447C" }
+    ],
+    tarjetas: {
+      debito:  [
+        { id: "mama-4821",    dueño: "mama",    numero: "4821", banco: "BancoEstado", saldo: 2345900 },
+        { id: "hermano-2093", dueño: "hermano", numero: "2093", banco: "BancoEstado", saldo: 890000  },
+        { id: "andreu-5510",  dueño: "andreu",  numero: "5510", banco: "BancoEstado", saldo: 1120400 }
+      ],
+      credito: [
+        { id: "mama-1077",    dueño: "mama",    numero: "1077", banco: "Santander"  },
+        { id: "hermano-8841", dueño: "hermano", numero: "8841", banco: "Falabella"  },
+        { id: "andreu-6204",  dueño: "andreu",  numero: "6204", banco: "Santander"  }
+      ]
+    },
+    cuentaPrincipal: "mama-4821",
+    metricas: { saldo: 2345900, ingresos: 2815000, gastos: 1695019 },
+    movimientos: [
+      { fecha: "20 jun", descripcion: "Mercado para mí",    dueño: "andreu",  tarjeta: "5510", monto: -46100  },
+      { fecha: "18 jun", descripcion: "Cena de viernes",    dueño: "mama",    tarjeta: "4821", monto: -34400  },
+      { fecha: "16 jun", descripcion: "Gimnasio",           dueño: "hermano", tarjeta: "8841", monto: -24990  },
+      { fecha: "14 jun", descripcion: "Cumple Andrés gift", dueño: "andreu",  tarjeta: "6204", monto: -15000  },
+      { fecha: "12 jun", descripcion: "Libro Buscalibre",   dueño: "andreu",  tarjeta: "5510", monto: -12900  },
+      { fecha: "10 jun", descripcion: "Bencina",            dueño: "hermano", tarjeta: "2093", monto: -31000  },
+      { fecha:  "8 jun", descripcion: "Almuerzo oficina",   dueño: "mama",    tarjeta: "1077", monto: -8920   },
+      { fecha:  "6 jun", descripcion: "Spotify",            dueño: "andreu",  tarjeta: "6204", monto: -5990   },
+      { fecha:  "2 jun", descripcion: "Sueldo HomeLettuce", dueño: "andreu",  tarjeta: "5510", monto: 1500000 }
+    ]
+  },
+  B: {
+    nombre: "Familia B",
+    miembros: [
+      { id: "papa", inicial: "P", nombre: "Papá", color: "#FAC775", textColor: "#633806" }
+    ],
+    tarjetas: {
+      debito:  [
+        { id: "papa-3301", dueño: "papa", numero: "3301", banco: "Santander",  saldo: 1850000 }
+      ],
+      credito: [
+        { id: "papa-7782", dueño: "papa", numero: "7782", banco: "BancoChile" }
+      ]
+    },
+    cuentaPrincipal: "papa-3301",
+    metricas: { saldo: 1850000, ingresos: 2200000, gastos: 743000 },
+    movimientos: [
+      { fecha: "19 jun", descripcion: "Supermercado",       dueño: "papa", tarjeta: "3301", monto: -68000  },
+      { fecha: "15 jun", descripcion: "Restaurant viernes", dueño: "papa", tarjeta: "7782", monto: -42000  },
+      { fecha: "12 jun", descripcion: "Bencina",            dueño: "papa", tarjeta: "3301", monto: -55000  },
+      { fecha:  "5 jun", descripcion: "Sueldo",             dueño: "papa", tarjeta: "3301", monto: 2200000 }
+    ]
+  }
+};
+
+const COMPARTIDO = {
+  items: [
+    { nombre: "Plan celular familia", categoria: "Servicios",     division: 4, proximoCobro: "20 jun", monto: 29900 },
+    { nombre: "Google One",           categoria: "Suscripciones", division: 4, proximoCobro: "8 jun",  monto: 4500  }
+  ],
+  totalMes: 34400,
+  miParteDivisor: 4,
+  miParteNumerador: 3
+};
+
+const PERSONAL = {
+  nombre: "Andreu",
+  inicial: "A",
+  color: "#B5D4F4",
+  textColor: "#0C447C",
+  cuentas: ["Cuenta vista BancoEstado", "Tarjeta crédito Santander"],
+  metricas: { saldo: 1120400, ingresos: 1500000, gastos: 188800 },
+  movimientos: [
+    { fecha: "20 jun", descripcion: "Mercado para mí",    categoria: "Mercado",       monto: -46100  },
+    { fecha: "18 jun", descripcion: "Cena de viernes",    categoria: "Restaurantes",  monto: -34400  },
+    { fecha: "16 jun", descripcion: "Gimnasio",           categoria: "Salud",         monto: -24990  },
+    { fecha: "14 jun", descripcion: "Cumple Andrés gift", categoria: "Otros",         monto: -15000  },
+    { fecha: "12 jun", descripcion: "Libro Buscalibre",   categoria: "Educación",     monto: -12900  },
+    { fecha: "10 jun", descripcion: "Bencina",            categoria: "Transporte",    monto: -31000  },
+    { fecha:  "8 jun", descripcion: "Almuerzo oficina",   categoria: "Restaurantes",  monto: -8920   },
+    { fecha:  "6 jun", descripcion: "Spotify",            categoria: "Suscripciones", monto: -5990   },
+    { fecha:  "4 jun", descripcion: "Café Altura",        categoria: "Restaurantes",  monto: -9500   },
+    { fecha:  "2 jun", descripcion: "Sueldo HomeLettuce", categoria: "Sueldo",        monto: 1500000 }
+  ]
+};
+
+
+// ─── Avatar con colores inline (para miembros de FAMILIAS) ───────────────────
+function MemberAvatar({ member, size = 24 }) {
+  return (
+    <span
+      className="rounded-full inline-flex items-center justify-center font-semibold shrink-0 select-none"
+      style={{ width: size, height: size, backgroundColor: member.color,
+               color: member.textColor, fontSize: Math.round(size * 0.42) }}>
+      {member.inicial}
+    </span>
+  );
+}
+
+// Divisor visual entre bloques
+function SectionDivider() {
+  return (
+    <div className="border-t border-black/[.08] dark:border-white/[.08] my-7" aria-hidden="true"/>
+  );
+}
+
+
+// ─── BLOQUE 1: Compartido ────────────────────────────────────────────────────
+function CompartidoBloque() {
+  const { items, totalMes, miParteDivisor, miParteNumerador } = COMPARTIDO;
+  const miParte = Math.round(totalMes * miParteNumerador / miParteDivisor);
+
+  return (
+    <section>
+      <div className="flex items-center gap-2.5 mb-4">
+        <span className="text-[11px] font-medium uppercase tracking-[.08em]
+                         text-ink-mute dark:text-night-softText">
+          1 · Compartido
+        </span>
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium
+                         bg-yellow-100 text-yellow-700 dark:bg-yellow-400/15 dark:text-yellow-300">
+          entre familias
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <MetricCard
+          icon={<IconFinBalance/>}
+          label="Total gastos compartidos"
+          value={`${formatCLP(totalMes)}/mes`}/>
+        <MetricCard
+          icon={<IconFinWallet/>}
+          label="Tu parte prorrateada"
+          value={formatCLP(miParte)}
+          sublabel={`(${miParteNumerador}/${miParteDivisor})`}/>
+      </div>
+
+      <div className="bg-white dark:bg-night-card rounded-2xl
+                      border border-black/[.04] dark:border-white/[.05] shadow-subtle overflow-hidden">
+        <div className="hidden sm:grid grid-cols-[1fr_110px_110px_130px] gap-3 px-4 py-2.5
+                        text-[11px] uppercase tracking-[.08em]
+                        text-ink-mute dark:text-night-softText
+                        border-b border-black/[.05] dark:border-white/[.05]">
+          <div>Gasto</div><div>División</div>
+          <div className="text-right">Próx. cobro</div>
+          <div className="text-right">Monto</div>
+        </div>
+        <ul>
+          {items.map((item, i) => {
+            const colorId = FIN_CATEGORY_TO_COLOR[item.categoria] || 'sky';
+            return (
+              <li key={i}
+                  className={i > 0 ? 'border-t border-black/[.045] dark:border-white/[.05]' : ''}>
+                <div className="hidden sm:grid grid-cols-[1fr_110px_110px_130px] gap-3 items-center px-4 py-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-[13.5px] font-medium text-ink dark:text-night-text truncate">
+                      {item.nombre}
+                    </span>
+                    <FinBadge color={colorId}>{item.categoria}</FinBadge>
+                  </div>
+                  <div className="text-[12.5px] text-ink-soft dark:text-night-softText">
+                    + {item.division} personas
+                  </div>
+                  <div className="text-right text-[12.5px] tabular-nums text-ink-mute dark:text-night-softText">
+                    {item.proximoCobro}
+                  </div>
+                  <div className="text-right text-[14px] font-medium tabular-nums text-ink dark:text-night-text">
+                    {formatCLP(item.monto)}
+                    <span className="text-[11px] text-ink-mute dark:text-night-softText font-normal">/mes</span>
+                  </div>
+                </div>
+                <div className="sm:hidden px-4 py-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-[14px] font-medium text-ink dark:text-night-text truncate">
+                      {item.nombre}
+                    </div>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <FinBadge color={colorId}>{item.categoria}</FinBadge>
+                      <span className="text-[11.5px] text-ink-mute dark:text-night-softText">
+                        ÷ {item.division}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right text-[14px] font-medium tabular-nums text-ink dark:text-night-text shrink-0">
+                    {formatCLP(item.monto)}
+                    <span className="text-[10.5px] text-ink-mute dark:text-night-softText font-normal">/mes</span>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+
+// ─── BLOQUE 2: Mi Familia ────────────────────────────────────────────────────
+function FamiliaBloque({ activeFamily }) {
+  const familia = FAMILIAS[activeFamily];
+  const { miembros, tarjetas, cuentaPrincipal, metricas, movimientos, nombre } = familia;
+  const [selectedCard, setSelectedCard] = React.useState(null);
+
+  const getMember = (id) => miembros.find(m => m.id === id);
+  const cuentaP   = [...tarjetas.debito, ...tarjetas.credito].find(t => t.id === cuentaPrincipal);
+
+  const selectedNumero = React.useMemo(
+    () => [...tarjetas.debito, ...tarjetas.credito].find(t => t.id === selectedCard)?.numero ?? null,
+    [tarjetas, selectedCard]
+  );
+
+  const movsVisibles = React.useMemo(() => {
+    const base = selectedNumero
+      ? movimientos.filter(m => m.tarjeta === selectedNumero)
+      : movimientos;
+    return base.slice(0, 8);
+  }, [movimientos, selectedNumero]);
+
+  const balance = metricas.ingresos - metricas.gastos;
+
+  const CardPill = ({ t }) => {
+    const member   = getMember(t.dueño);
+    const isActive = selectedCard === t.id;
+    return (
+      <button
+        onClick={() => setSelectedCard(isActive ? null : t.id)}
+        className={`inline-flex items-center gap-1.5 pl-2.5 pr-3 py-1.5 rounded-full
+                    text-[13px] border transition-all duration-200 whitespace-nowrap
+                    ${isActive
+                      ? 'border-accent bg-accent-tint text-ink dark:text-night-text ring-1 ring-accent shadow-subtle'
+                      : 'border-black/[.07] dark:border-white/[.08] bg-white dark:bg-night-card text-ink-soft dark:text-night-softText hover:border-black/[.16] dark:hover:border-white/[.16] hover:text-ink dark:hover:text-night-text'}`}>
+        {member && (
+          <span style={{ color: member.textColor, lineHeight: 1 }} aria-hidden="true">●</span>
+        )}
+        <span className="font-medium">{member?.nombre ?? t.dueño}</span>
+        <span className="tabular-nums text-ink-mute dark:text-night-softText">{t.numero}</span>
+      </button>
+    );
+  };
+
+  return (
+    <section className="space-y-5">
+      <div>
+        <div className="text-[11px] font-medium uppercase tracking-[.08em]
+                        text-ink-mute dark:text-night-softText mb-1">
+          2 · Mi Familia
+        </div>
+        {cuentaP && (
+          <p className="text-[12.5px] text-ink-soft dark:text-night-softText">
+            {cuentaP.banco} débito ···· {cuentaP.numero}
+          </p>
+        )}
+      </div>
+
+      {/* 4 metric cards */}
+      <div className="-mx-5 sm:mx-0 px-5 sm:px-0
+                      flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-3
+                      overflow-x-auto snap-x sm:overflow-visible no-scrollbar">
+        <MetricCard icon={<IconFinWallet/>}  label="Saldo disponible" value={formatCLP(metricas.saldo)}/>
+        <MetricCard icon={<IconFinIn/>}      label="Ingresos del mes" value={formatCLP(metricas.ingresos)} variant="positive"/>
+        <MetricCard icon={<IconFinOut/>}     label="Gastos del mes"   value={formatCLP(metricas.gastos)}   variant="negative"/>
+        <MetricCard icon={<IconFinBalance/>} label="Balance"
+          value={(balance >= 0 ? '+' : '') + formatCLP(balance)}
+          variant="balanced" amount={balance}/>
+      </div>
+
+      {/* Selector de tarjetas */}
+      <div className="-mx-5 sm:mx-0 px-5 sm:px-0 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-3 min-w-max py-1">
+          <span className="text-[10.5px] font-semibold uppercase tracking-[.09em]
+                           text-ink-mute dark:text-night-softText shrink-0">Débito</span>
+          {tarjetas.debito.map(t => <CardPill key={t.id} t={t}/>)}
+          <div className="self-stretch w-px bg-black/[.08] dark:bg-white/[.1] my-0.5"/>
+          <span className="text-[10.5px] font-semibold uppercase tracking-[.09em]
+                           text-ink-mute dark:text-night-softText shrink-0">Crédito</span>
+          {tarjetas.credito.map(t => <CardPill key={t.id} t={t}/>)}
+        </div>
+      </div>
+
+      {/* Tabla mini movimientos */}
+      <div>
+        <div className="text-[11px] font-medium uppercase tracking-[.08em]
+                        text-ink-mute dark:text-night-softText mb-3">
+          Últimos movimientos · {nombre}
+        </div>
+        <div className="bg-white dark:bg-night-card rounded-2xl
+                        border border-black/[.04] dark:border-white/[.05] shadow-subtle overflow-hidden">
+          <div className="hidden sm:grid grid-cols-[72px_1fr_56px_70px_120px] gap-3 px-4 py-2.5
+                          text-[11px] uppercase tracking-[.08em]
+                          text-ink-mute dark:text-night-softText
+                          border-b border-black/[.05] dark:border-white/[.05]">
+            <div>Fecha</div><div>Descripción</div>
+            <div>Dueño</div><div>Tarjeta</div>
+            <div className="text-right">Monto</div>
+          </div>
+          <ul>
+            {movsVisibles.map((mov, i) => {
+              const member = getMember(mov.dueño);
+              return (
+                <li key={i}
+                    className={i > 0 ? 'border-t border-black/[.045] dark:border-white/[.05]' : ''}>
+                  <div className="hidden sm:grid grid-cols-[72px_1fr_56px_70px_120px] gap-3 items-center px-4 py-3">
+                    <div className="text-[12.5px] tabular-nums text-ink-soft dark:text-night-softText">
+                      {mov.fecha}
+                    </div>
+                    <div className="text-[13.5px] text-ink dark:text-night-text truncate">
+                      {mov.descripcion}
+                    </div>
+                    <div>{member && <MemberAvatar member={member} size={22}/>}</div>
+                    <div className="text-[12.5px] tabular-nums text-ink-mute dark:text-night-softText">
+                      {mov.tarjeta}
+                    </div>
+                    <div className={`text-right text-[14px] font-medium tabular-nums
+                                     ${mov.monto >= 0
+                                       ? 'text-green-600 dark:text-green-400'
+                                       : 'text-red-500  dark:text-red-400'}`}>
+                      {mov.monto >= 0 ? '+' : ''}{formatCLP(mov.monto)}
+                    </div>
+                  </div>
+                  <div className="sm:hidden px-4 py-3 flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11.5px] tabular-nums text-ink-mute dark:text-night-softText">
+                          {mov.fecha}
+                        </span>
+                        {member && <MemberAvatar member={member} size={18}/>}
+                      </div>
+                      <div className="mt-1 text-[14px] text-ink dark:text-night-text truncate">
+                        {mov.descripcion}
+                      </div>
+                    </div>
+                    <div className={`text-right text-[14px] font-medium tabular-nums shrink-0
+                                     ${mov.monto >= 0
+                                       ? 'text-green-600 dark:text-green-400'
+                                       : 'text-red-500  dark:text-red-400'}`}>
+                      {mov.monto >= 0 ? '+' : ''}{formatCLP(mov.monto)}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          {movimientos.length > 8 && (
+            <div className="px-4 py-2.5 text-right
+                            border-t border-black/[.045] dark:border-white/[.05]">
+              <span className="text-[12px] text-ink-mute dark:text-night-softText">Ver todos →</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+// ─── BLOQUE 3: Análisis ──────────────────────────────────────────────────────
+function AnalisisBloque({ data }) {
+  const { accounts, budgets, fixedExpenses, transactions, commitments } = data;
+  const [activeTab,  setActiveTab]  = React.useState('gastos');
+  const [gastosTab,  setGastosTab]  = React.useState('stable');
+
+  return (
+    <FinAccountsCtx.Provider value={accounts}>
+      <section>
+        <div className="text-[11px] font-medium uppercase tracking-[.08em]
+                        text-ink-mute dark:text-night-softText mb-4">
+          3 · Análisis y detalle
+        </div>
+
+        <FinTabs value={activeTab} onValueChange={setActiveTab}>
+          <div className="-mx-5 sm:mx-0 px-5 sm:px-0 overflow-x-auto no-scrollbar">
+            <FinTabsList>
+              <FinTabsTrigger value="gastos">Gastos</FinTabsTrigger>
+              <FinTabsTrigger value="presupuestos">Presupuestos</FinTabsTrigger>
+              <FinTabsTrigger value="categorias">Categorías</FinTabsTrigger>
+              <FinTabsTrigger value="tarjetas">Tarjetas</FinTabsTrigger>
+              <FinTabsTrigger value="movimientos">Movimientos</FinTabsTrigger>
+            </FinTabsList>
+          </div>
+
+          <div className="mt-6">
+            <FinTabsContent value="gastos">
+              <FinTabs value={gastosTab} onValueChange={setGastosTab}>
+                <FinTabsList look="seg">
+                  <FinTabsTrigger value="stable">Fijos · Estables</FinTabsTrigger>
+                  <FinTabsTrigger value="variable">Fijos · Variables</FinTabsTrigger>
+                  <FinTabsTrigger value="recurring">Recurrentes</FinTabsTrigger>
+                  <FinTabsTrigger value="one-time">Puntuales</FinTabsTrigger>
+                  <FinTabsTrigger value="commitments">Cuotas / Comprometido</FinTabsTrigger>
+                </FinTabsList>
+                <div className="mt-5">
+                  <FinTabsContent value="stable">
+                    <GastosView kind="stable" fixedExpenses={fixedExpenses}/>
+                  </FinTabsContent>
+                  <FinTabsContent value="variable">
+                    <GastosView kind="variable" fixedExpenses={fixedExpenses}/>
+                  </FinTabsContent>
+                  <FinTabsContent value="recurring">
+                    <GastosView kind="recurring" fixedExpenses={fixedExpenses}/>
+                  </FinTabsContent>
+                  <FinTabsContent value="one-time">
+                    <GastosView kind="one-time" fixedExpenses={fixedExpenses}/>
+                  </FinTabsContent>
+                  <FinTabsContent value="commitments">
+                    <GastosCommitments commitments={commitments} accounts={accounts}/>
+                  </FinTabsContent>
+                </div>
+              </FinTabs>
+            </FinTabsContent>
+
+            <FinTabsContent value="presupuestos">
+              <PresupuestosView budgets={budgets}/>
+            </FinTabsContent>
+
+            <FinTabsContent value="categorias">
+              <GastosByCategory transactions={transactions}/>
+            </FinTabsContent>
+
+            <FinTabsContent value="tarjetas">
+              <TarjetasView accounts={accounts} highlightId={null}/>
+            </FinTabsContent>
+
+            <FinTabsContent value="movimientos">
+              <MovimientosTable transactions={transactions} maxRows={999}/>
+            </FinTabsContent>
+          </div>
+        </FinTabs>
+      </section>
+    </FinAccountsCtx.Provider>
+  );
+}
+
+
+// ─── BLOQUE 4: Personal ──────────────────────────────────────────────────────
+function PersonalBloque() {
+  const [privacyOn,   setPrivacyOn]   = React.useState(true);
+  const [personalTab, setPersonalTab] = React.useState('movimientos');
+  const [searchQ,     setSearchQ]     = React.useState('');
+
+  const filteredMovs = React.useMemo(() => {
+    const needle = searchQ.trim().toLowerCase();
+    if (!needle) return PERSONAL.movimientos;
+    return PERSONAL.movimientos.filter(m =>
+      m.descripcion.toLowerCase().includes(needle) ||
+      m.categoria.toLowerCase().includes(needle)
+    );
+  }, [searchQ]);
+
+  const me = { inicial: PERSONAL.inicial, color: PERSONAL.color, textColor: PERSONAL.textColor };
+
+  return (
+    <section>
+      <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[11px] font-medium uppercase tracking-[.08em]
+                           text-ink-mute dark:text-night-softText">
+            4 · Personal
+          </span>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium
+                           bg-purple-100 text-purple-600 dark:bg-purple-400/15 dark:text-purple-300">
+            <IconFinLock/> Solo yo
+          </span>
+        </div>
+        <PrivacyToggle isPrivate={privacyOn} onChange={setPrivacyOn}/>
+      </div>
+
+      {!privacyOn ? (
+        <div className="rounded-2xl bg-paper-soft/60 dark:bg-night-soft/60
+                        border border-dashed border-black/[.08] dark:border-white/[.08]
+                        py-10 text-center space-y-3">
+          <p className="text-[13px] text-ink-mute dark:text-night-softText">
+            Privacidad desactivada · tus datos son visibles para la familia
+          </p>
+          <button
+            onClick={() => setPrivacyOn(true)}
+            className="px-4 py-2 rounded-full bg-accent text-[hsl(var(--accent-strong))]
+                       text-[13px] font-medium hover:opacity-90 transition-opacity">
+            Reactivar
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          <div className="flex items-center gap-3">
+            <MemberAvatar member={me} size={36}/>
+            <div className="min-w-0">
+              <p className="text-[15px] font-medium text-ink dark:text-night-text">
+                Finanzas personales de {PERSONAL.nombre}
+              </p>
+              <p className="text-[12px] text-ink-soft dark:text-night-softText">
+                Estos datos solo los ves tú mientras la privacidad esté activa.
+              </p>
+            </div>
+          </div>
+          <p className="text-[12px] text-ink-mute dark:text-night-softText">
+            Incluye{' '}
+            <span className="text-ink-soft dark:text-night-text">
+              {PERSONAL.cuentas.join(' + ')}
+            </span>
+          </p>
+
+          <div className="-mx-5 sm:mx-0 px-5 sm:px-0
+                          flex sm:grid sm:grid-cols-3 gap-3
+                          overflow-x-auto snap-x sm:overflow-visible no-scrollbar">
+            <MetricCard icon={<IconFinWallet/>} label="Saldo disponible" value={formatCLP(PERSONAL.metricas.saldo)}/>
+            <MetricCard icon={<IconFinIn/>}     label="Ingresos del mes" value={formatCLP(PERSONAL.metricas.ingresos)} variant="positive"/>
+            <MetricCard icon={<IconFinOut/>}    label="Gastos del mes"   value={formatCLP(PERSONAL.metricas.gastos)}   variant="negative"/>
+          </div>
+
+          <FinTabs value={personalTab} onValueChange={setPersonalTab}>
+            <div className="-mx-5 sm:mx-0 px-5 sm:px-0 overflow-x-auto no-scrollbar">
+              <FinTabsList>
+                <FinTabsTrigger value="movimientos">Movimientos</FinTabsTrigger>
+                <FinTabsTrigger value="presupuestos">Presupuestos</FinTabsTrigger>
+                <FinTabsTrigger value="categorias">Categorías</FinTabsTrigger>
+              </FinTabsList>
+            </div>
+            <div className="mt-5">
+              <FinTabsContent value="movimientos">
+                <div className="flex items-center gap-2 rounded-2xl px-3.5 py-2.5 mb-3
+                                bg-paper-soft dark:bg-night-soft
+                                border border-transparent focus-within:border-accent
+                                focus-within:bg-white dark:focus-within:bg-night transition-colors">
+                  <span className="text-ink-mute dark:text-night-softText shrink-0">
+                    <IconFinSearch/>
+                  </span>
+                  <input
+                    type="text" value={searchQ} onChange={e => setSearchQ(e.target.value)}
+                    placeholder="Buscar por descripción o categoría..."
+                    className="w-full bg-transparent outline-none text-[14px]
+                               placeholder:text-ink-mute dark:placeholder:text-night-softText"/>
+                </div>
+                <div className="bg-white dark:bg-night-card rounded-2xl
+                                border border-black/[.04] dark:border-white/[.05] shadow-subtle overflow-hidden">
+                  <div className="hidden sm:grid grid-cols-[72px_1fr_140px_120px] gap-3 px-4 py-2.5
+                                  text-[11px] uppercase tracking-[.08em]
+                                  text-ink-mute dark:text-night-softText
+                                  border-b border-black/[.05] dark:border-white/[.05]">
+                    <div>Fecha</div><div>Descripción</div>
+                    <div>Categoría</div><div className="text-right">Monto</div>
+                  </div>
+                  <ul>
+                    {filteredMovs.length === 0 && (
+                      <li className="px-4 py-8 text-center text-[13px] text-ink-mute dark:text-night-softText">
+                        Sin movimientos para tu búsqueda.
+                      </li>
+                    )}
+                    {filteredMovs.map((m, i) => {
+                      const colorId = FIN_CATEGORY_TO_COLOR[m.categoria] || 'sky';
+                      return (
+                        <li key={i}
+                            className={i > 0 ? 'border-t border-black/[.045] dark:border-white/[.05]' : ''}>
+                          <div className="hidden sm:grid grid-cols-[72px_1fr_140px_120px] gap-3 items-center px-4 py-3">
+                            <div className="text-[12.5px] tabular-nums text-ink-soft dark:text-night-softText">
+                              {m.fecha}
+                            </div>
+                            <div className="text-[13.5px] text-ink dark:text-night-text truncate">
+                              {m.descripcion}
+                            </div>
+                            <div><FinBadge color={colorId}>{m.categoria}</FinBadge></div>
+                            <div className={`text-right text-[14px] font-medium tabular-nums
+                                             ${m.monto >= 0
+                                               ? 'text-green-600 dark:text-green-400'
+                                               : 'text-red-500  dark:text-red-400'}`}>
+                              {m.monto >= 0 ? '+' : ''}{formatCLP(m.monto)}
+                            </div>
+                          </div>
+                          <div className="sm:hidden px-4 py-3 flex items-center gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11.5px] tabular-nums text-ink-mute dark:text-night-softText">
+                                  {m.fecha}
+                                </span>
+                                <FinBadge color={colorId}>{m.categoria}</FinBadge>
+                              </div>
+                              <div className="mt-1 text-[14px] text-ink dark:text-night-text truncate">
+                                {m.descripcion}
+                              </div>
+                            </div>
+                            <div className={`text-right text-[14px] font-medium tabular-nums shrink-0
+                                             ${m.monto >= 0
+                                               ? 'text-green-600 dark:text-green-400'
+                                               : 'text-red-500  dark:text-red-400'}`}>
+                              {m.monto >= 0 ? '+' : ''}{formatCLP(m.monto)}
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </FinTabsContent>
+              <FinTabsContent value="presupuestos">
+                <EmptyHint text="Presupuestos personales próximamente."/>
+              </FinTabsContent>
+              <FinTabsContent value="categorias">
+                <EmptyHint text="Categorías personales próximamente."/>
+              </FinTabsContent>
+            </div>
+          </FinTabs>
+        </div>
+      )}
+    </section>
+  );
 }
 
 
 // ─── src/pages/FinanzasPage.tsx ─────────────────────────────────────────────
 function FinanzasPage() {
-  // Usuario activo simulado (Phase 1). Determina qué sub-familia se ve.
-  const [activeUser, setActiveUser] = React.useState(finReadActiveUser);
-  React.useEffect(() => {
-    try { localStorage.setItem(FIN_ACTIVE_USER_KEY, activeUser); } catch (_) {}
-  }, [activeUser]);
-  const subfamilyId = finSubfamilyOf(activeUser);
+  const [activeFamily, setActiveFamily] = React.useState('A');
 
-  const fam    = useFamilyFinances(subfamilyId);
-  const shared = useSharedFinances();
-  const per    = usePersonalFinances();
+  const fam = useFamilyFinances(activeFamily);
 
-  const [tab, setTab] = React.useState('familia'); // familia | personal
-
-  if (fam.isLoading || per.isLoading) return <FinanzasLoading/>;
-  if (fam.error    || per.error)      return <FinanzasError/>;
+  if (fam.isLoading) return <FinanzasLoading/>;
+  if (fam.error)     return <FinanzasError/>;
 
   return (
     <div className="route-fade max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-10 pb-28 md:pb-14">
 
-      {/* Encabezado de página */}
-      <header className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+      {/* HEADER */}
+      <header className="mb-8 flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
           <h1 className="text-[28px] sm:text-[34px] font-medium tracking-tight
                          text-ink dark:text-night-text">
@@ -2365,42 +2956,51 @@ function FinanzasPage() {
             Lo compartido por toda la casa y lo de tu familia, en un solo lugar.
           </p>
         </div>
-
         <div className="flex items-center gap-2.5 flex-wrap">
-          <ActiveUserSelector userId={activeUser} onChange={setActiveUser}/>
-          <FinTabs value={tab} onValueChange={setTab}>
-            <FinTabsList>
-              <FinTabsTrigger value="familia">Familia</FinTabsTrigger>
-              <FinTabsTrigger value="personal">Personal</FinTabsTrigger>
-            </FinTabsList>
-          </FinTabs>
+          {/* Avatar pill Andreu */}
+          <span className="inline-flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full
+                           border border-black/[.08] dark:border-white/[.1]
+                           bg-white dark:bg-night-card">
+            <MemberAvatar
+              member={{ inicial: 'A', color: '#B5D4F4', textColor: '#0C447C' }}
+              size={24}/>
+            <span className="text-[13.5px] font-medium text-ink dark:text-night-text">Andreu</span>
+          </span>
+          {/* Toggle A / B */}
+          <div className="inline-flex p-1 rounded-full bg-paper-soft dark:bg-night-soft">
+            {['A', 'B'].map(f => (
+              <button
+                key={f}
+                onClick={() => setActiveFamily(f)}
+                className={`px-4 py-1.5 rounded-full text-[13.5px] transition-colors
+                            ${activeFamily === f
+                              ? 'bg-white dark:bg-night-card text-ink dark:text-night-text font-medium shadow-subtle border border-black/[.05] dark:border-white/[.06]'
+                              : 'text-ink-soft dark:text-night-softText hover:text-ink dark:hover:text-night-text'}`}>
+                {FAMILIAS[f].nombre}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
-      <FinTabs value={tab} onValueChange={setTab}>
+      {/* BLOQUE 1 · Compartido */}
+      <CompartidoBloque/>
 
-        {/* ───────────── FAMILIA ───────────── */}
-        <FinTabsContent value="familia">
-          <div className="space-y-8">
-            {/* Resumen combinado: mi parte compartida + mi familia */}
-            <CombinedSummary
-              shared={shared.data}
-              subfamilyId={subfamilyId}
-              famData={fam.data}/>
+      <SectionDivider/>
 
-            {/* Capa 1 · Compartido (visible para todos) */}
-            <SharedSection shared={shared.data} subfamilyId={subfamilyId}/>
+      {/* BLOQUE 2 · Mi Familia — key resetea selectedCard al cambiar familia */}
+      <FamiliaBloque key={activeFamily} activeFamily={activeFamily}/>
 
-            {/* Capa 2 · Mi familia (privada · cambia con el usuario activo) */}
-            <MiFamiliaSection key={subfamilyId} subfamilyId={subfamilyId} data={fam.data}/>
-          </div>
-        </FinTabsContent>
+      <SectionDivider/>
 
-        {/* ───────────── PERSONAL ───────────── */}
-        <FinTabsContent value="personal">
-          <PersonalView data={per.data} activeUser={activeUser}/>
-        </FinTabsContent>
-      </FinTabs>
+      {/* BLOQUE 3 · Análisis — sin key: mantiene tabs, recarga datos */}
+      <AnalisisBloque data={fam.data}/>
+
+      <SectionDivider/>
+
+      {/* BLOQUE 4 · Personal */}
+      <PersonalBloque/>
+
     </div>
   );
 }

@@ -158,9 +158,11 @@ function AlTabs({ value, onChange, children, className = '' }) {
 }
 function AlTabsList({ children }) {
   return (
-    <div className="inline-flex items-center gap-1 p-1 rounded-full
-                    bg-paper-soft dark:bg-night-soft">
-      {children}
+    <div className="-mx-1 px-1 overflow-x-auto hl-noscrollbar max-w-full">
+      <div className="inline-flex items-center gap-1 p-1 rounded-full w-max
+                      bg-paper-soft dark:bg-night-soft">
+        {children}
+      </div>
     </div>
   );
 }
@@ -169,8 +171,8 @@ function AlTabsTrigger({ value, icon, children }) {
   const active = cur === value;
   return (
     <button onClick={() => onChange(value)}
-      className={`flex items-center gap-2 px-4 sm:px-5 py-1.5 rounded-full
-                  text-[13.5px] transition-colors
+      className={`flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-1.5 rounded-full
+                  text-[13.5px] whitespace-nowrap shrink-0 transition-colors
                   ${active
                     ? 'bg-white dark:bg-night-card text-ink dark:text-night-text font-medium shadow-subtle'
                     : 'text-ink-soft dark:text-night-softText hover:text-ink dark:hover:text-night-text'}`}>

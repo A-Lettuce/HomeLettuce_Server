@@ -369,12 +369,13 @@ function VgPlanificadorCard({
         </div>
       </div>
 
-      {/* Header de días */}
-      <VgWeekDaysHeader highlightDay={highlightDay} onPickDay={onPickDay}/>
-
-      {/* Grilla horaria */}
-      <div className="overflow-x-auto">
+      {/* Header de días + grilla horaria — comparten el mismo scroll y ancho
+          mínimo para que las columnas queden alineadas y los nombres completos
+          de día no se aplasten en pantallas estrechas. */}
+      <div className="overflow-x-auto hl-noscrollbar">
         <div className="min-w-[760px]">
+          <VgWeekDaysHeader highlightDay={highlightDay} onPickDay={onPickDay}/>
+
           <div className="flex"
                style={{ height: `${(VG_DAY_VIEW_END - VG_DAY_VIEW_START) * 44}px` }}>
             <VgHourLabels/>
