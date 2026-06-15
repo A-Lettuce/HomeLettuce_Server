@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --accent: 150 38% 76%; --accent-strong: 152 30% 38%; --accent-tint: 150 50% 95%; }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="min-height:100%; background:#ecebe5; font-family:'Inter',ui-sans-serif,system-ui,sans-serif; color:#1f2421; -webkit-font-smoothing:antialiased; padding:40px 28px 96px;">
+  <div style="max-width:1240px; margin:0 auto;">
+
+    <!-- ── Title ── -->
+    <div style="display:flex; align-items:flex-end; gap:14px; margin-bottom:6px;">
+      <div style="height:40px; width:40px; border-radius:14px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 2px rgba(20,28,24,.06); border:1px solid rgba(0,0,0,.04);">
+        <svg viewBox="0 0 32 32" width="24" height="24" aria-hidden="true">
+          <clipPath id="lcx"><path d="M16 4c7.4 0 12 4.6 12 12 0 7-5.4 12-12 12S4 23 4 16C4 8.6 8.6 4 16 4Z"/></clipPath>
+          <g clip-path="url(#lcx)">
+            <circle cx="10" cy="22" r="9" fill="hsl(var(--accent))" opacity="0.55"/>
+            <circle cx="22" cy="22" r="9" fill="hsl(var(--accent))" opacity="0.55"/>
+            <circle cx="9" cy="13" r="8" fill="hsl(var(--accent))" opacity="0.75"/>
+            <circle cx="23" cy="13" r="8" fill="hsl(var(--accent))" opacity="0.75"/>
+            <circle cx="16" cy="9" r="8" fill="hsl(var(--accent))"/>
+          </g>
+        </svg>
+      </div>
+      <h1 style="margin:0; font-size:30px; font-weight:600; letter-spacing:-0.02em; line-height:1;">Home Lettuce · Reestructuración de navegación</h1>
+    </div>
+    <p style="margin:0 0 26px 54px; font-size:15px; color:#525853; max-width:680px;">
+      Salud y Finanzas pasan a ser <strong>categorías padre</strong> en el menú, con sus secciones como hijos. Menú acordeón, los dashboards de cada categoría y la pantalla de Inicio. La paleta cambia todo en vivo.
+    </p>
+
+    <!-- ── Palette switcher ── -->
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:0 0 38px 54px;">
+      <span style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.09em; color:#8b9089;">Paleta</span>
+      <div style="display:flex; gap:8px;">
+        <sc-for list="{{ palettes }}" as="p" hint-placeholder-count="5">
+          <button onClick="{{ p.onClick }}" title="{{ p.name }}"
+            style="display:flex; align-items:center; gap:8px; padding:6px 12px 6px 7px; border-radius:999px; cursor:pointer; background:#fff; border:1px solid {{ p.border }}; box-shadow:{{ p.shadow }}; transition:border-color .15s;">
+            <span style="height:20px; width:20px; border-radius:999px; background:{{ p.swatch }}; box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);"></span>
+            <span style="font-size:13px; color:#1f2421; text-transform:capitalize;">{{ p.name }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <span style="font-size:12px; color:#a3a8a1;">· también en el panel Tweaks</span>
+    </div>
+
+    <!-- ════════ SECCIÓN 1 · MENÚ LATERAL ════════ -->
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+      <span style="font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:#8b9089;">1 · Menú lateral — acordeón</span>
+      <span style="flex:1; height:1px; background:rgba(0,0,0,.08);"></span>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div style="display:flex; align-items:baseline; gap:10px; margin:0 0 10px 2px;">
+        <span style="font-size:15px; font-weight:600;">Acordeón desplegable</span>
+        <span style="font-size:13px; color:#8b9089;">Las categorías se abren y cierran. Compacto; muestra solo lo que necesitas.</span>
+      </div>
+      <div style="display:flex; height:580px; background:#fff; border-radius:24px; overflow:hidden; border:1px solid rgba(0,0,0,.05); box-shadow:0 1px 2px rgba(20,28,24,.04);">
+        <!-- sidebar -->
+        <aside style="width:252px; flex-shrink:0; border-right:1px solid rgba(0,0,0,.05); display:flex; flex-direction:column;">
+          <div style="height:56px; display:flex; align-items:center; gap:10px; padding:0 18px; border-bottom:1px solid rgba(0,0,0,.05);">
+            <span style="font-size:14px; font-weight:600; letter-spacing:-.01em;">Home Lettuce</span>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding:14px 12px;">
+            <div style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:#8b9089; padding:0 12px 8px;">General</div>
+            <sc-for list="{{ aGeneral }}" as="it" hint-placeholder-count="6">
+              <button onClick="{{ it.onClick }}" style="{{ it.rowStyle }}" style-hover="background:#f4f4ef;">
+                <sc-if value="{{ it.active }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; left:0; top:8px; bottom:8px; width:3px; border-radius:999px; background:hsl(var(--accent));"></span></sc-if>
+                {{ it.icon }}<span>{{ it.name }}</span>
+              </button>
+            </sc-for>
+
+            <div style="height:1px; background:rgba(0,0,0,.06); margin:12px 12px;"></div>
+
+            <!-- Salud category -->
+            <button onClick="{{ toggleASalud }}" style="{{ aSaludHeadStyle }}" style-hover="background:#f4f4ef;">
+              {{ icHeart }}<span style="flex:1; text-align:left;">Salud</span>
+              <span style="{{ aSaludChevStyle }}">{{ icChevron }}</span>
+            </button>
+            <sc-if value="{{ aSaludOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="margin:2px 0 4px 20px; padding-left:14px; border-left:1px solid rgba(0,0,0,.07);">
+                <sc-for list="{{ aSaludChildren }}" as="it" hint-placeholder-count="5">
+                  <button onClick="{{ it.onClick }}" style="{{ it.childStyle }}" style-hover="background:#f4f4ef;">
+                    <span>{{ it.name }}</span>
+                    <sc-if value="{{ it.badge }}" hint-placeholder-val="{{ false }}"><span style="{{ it.badgeStyle }}">{{ it.badge }}</span></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <!-- Finanzas category -->
+            <button onClick="{{ toggleAFinanzas }}" style="{{ aFinHeadStyle }}" style-hover="background:#f4f4ef;">
+              {{ icWallet }}<span style="flex:1; text-align:left;">Finanzas</span>
+              <span style="{{ aFinChevStyle }}">{{ icChevron }}</span>
+            </button>
+            <sc-if value="{{ aFinOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="margin:2px 0 4px 20px; padding-left:14px; border-left:1px solid rgba(0,0,0,.07);">
+                <sc-for list="{{ aFinChildren }}" as="it" hint-placeholder-count="6">
+                  <button onClick="{{ it.onClick }}" style="{{ it.childStyle }}" style-hover="background:#f4f4ef;">
+                    <span>{{ it.name }}</span>
+                    <sc-if value="{{ it.badge }}" hint-placeholder-val="{{ false }}"><span style="{{ it.badgeStyle }}">{{ it.badge }}</span></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <div style="height:1px; background:rgba(0,0,0,.06); margin:12px 12px;"></div>
+            <div style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:#8b9089; padding:0 12px 8px;">Trabajo</div>
+            <button style="display:flex; align-items:center; gap:12px; width:100%; padding:10px 12px; border-radius:16px; border:none; background:none; cursor:pointer; font-size:14px; color:#525853; font-family:inherit;" style-hover="background:#f4f4ef;">
+              {{ icChart }}<span>Vantop Panel</span>
+              <span style="margin-left:auto; color:#b3b8b1;">{{ icExternal }}</span>
+            </button>
+          </div>
+        </aside>
+        <!-- content stub -->
+        <div style="flex:1; min-width:0; background:#fbfbf8; padding:30px 36px;">
+          <div style="font-size:12.5px; color:#8b9089; margin-bottom:6px;">{{ aCrumb }}</div>
+          <h2 style="margin:0 0 22px; font-size:30px; font-weight:600; letter-spacing:-.02em;">{{ aTitle }}</h2>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;">
+            <div style="height:120px; border-radius:18px; background:#fff; border:1px solid rgba(0,0,0,.05);"></div>
+            <div style="height:120px; border-radius:18px; background:#fff; border:1px solid rgba(0,0,0,.05);"></div>
+            <div style="height:120px; border-radius:18px; background:#fff; border:1px solid rgba(0,0,0,.05);"></div>
+          </div>
+          <div style="margin-top:14px; height:160px; border-radius:18px; background:#fff; border:1px solid rgba(0,0,0,.05);"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ SECCIÓN 2 · DASHBOARDS DE CATEGORÍA ════════ -->
+    <div style="display:flex; align-items:center; gap:10px; margin:52px 0 18px;">
+      <span style="font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:#8b9089;">2 · Dashboards de categoría (la "home" de cada una)</span>
+      <span style="flex:1; height:1px; background:rgba(0,0,0,.08);"></span>
+    </div>
+
+    <!-- Salud dashboard -->
+    <div style="margin-bottom:30px;">
+      <div style="font-size:15px; font-weight:600; margin:0 0 10px 2px;">Salud · resumen</div>
+      <div style="background:#fbfbf8; border-radius:24px; border:1px solid rgba(0,0,0,.05); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:32px 36px;">
+        <h2 style="margin:0 0 4px; font-size:28px; font-weight:600; letter-spacing:-.02em;">Salud</h2>
+        <p style="margin:0 0 24px; font-size:14px; color:#525853;">Bienestar físico, emocional y hábitos de consumo de la casa.</p>
+        <!-- metric chips -->
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:22px;">
+          <sc-for list="{{ saludMetrics }}" as="m" hint-placeholder-count="3">
+            <div style="flex:1; min-width:170px; background:#fff; border-radius:18px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:16px 18px;">
+              <div style="display:flex; align-items:center; gap:8px; color:#8b9089;">
+                <span style="height:28px; width:28px; border-radius:999px; background:hsl(var(--accent-tint)); color:hsl(var(--accent-strong)); display:flex; align-items:center; justify-content:center;">{{ m.icon }}</span>
+                <span style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em;">{{ m.label }}</span>
+              </div>
+              <div style="margin-top:12px; font-size:24px; font-weight:600; letter-spacing:-.01em;">{{ m.value }}</div>
+              <div style="margin-top:3px; font-size:11.5px; color:#8b9089;">{{ m.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <!-- category cards -->
+        <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px;">
+          <sc-for list="{{ saludCards }}" as="c" hint-placeholder-count="4">
+            <div style="background:#fff; border-radius:22px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:22px; display:flex; flex-direction:column; gap:14px; min-height:150px;">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+                <span style="height:44px; width:44px; border-radius:14px; background:hsl(var(--accent-tint)); color:hsl(var(--accent-strong)); display:flex; align-items:center; justify-content:center;">{{ c.icon }}</span>
+                <span style="{{ c.tagStyle }}">{{ c.tag }}</span>
+              </div>
+              <div style="margin-top:auto;">
+                <div style="font-size:15px; font-weight:600;">{{ c.name }}</div>
+                <div style="font-size:12.5px; color:#525853; margin-top:3px; line-height:1.4;">{{ c.hint }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- Finanzas dashboard -->
+    <div style="margin-bottom:14px;">
+      <div style="font-size:15px; font-weight:600; margin:0 0 10px 2px;">Finanzas · resumen</div>
+      <div style="background:#fbfbf8; border-radius:24px; border:1px solid rgba(0,0,0,.05); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:32px 36px;">
+        <h2 style="margin:0 0 4px; font-size:28px; font-weight:600; letter-spacing:-.02em;">Finanzas</h2>
+        <p style="margin:0 0 24px; font-size:14px; color:#525853;">Saldo, ingresos y gastos del hogar — atajos a cada sección.</p>
+        <!-- metrics -->
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;">
+          <sc-for list="{{ finMetrics }}" as="m" hint-placeholder-count="4">
+            <div style="background:#fff; border-radius:18px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:16px 18px;">
+              <div style="display:flex; align-items:center; gap:8px; color:#8b9089;">
+                <span style="height:26px; width:26px; border-radius:999px; background:#f4f4ef; display:flex; align-items:center; justify-content:center;">{{ m.icon }}</span>
+                <span style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em;">{{ m.label }}</span>
+              </div>
+              <div style="margin-top:12px; font-size:21px; font-weight:600; letter-spacing:-.01em; {{ m.valueColor }}">{{ m.value }}</div>
+              <div style="margin-top:3px; font-size:11px; color:#8b9089;">{{ m.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <!-- quick links -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+          <sc-for list="{{ finQuick }}" as="q" hint-placeholder-count="4">
+            <button style="display:flex; align-items:center; gap:9px; padding:11px 16px; border-radius:14px; background:#fff; border:1px solid rgba(0,0,0,.06); cursor:pointer; font-family:inherit; font-size:13.5px; color:#1f2421;" style-hover="border-color:hsl(var(--accent)); background:hsl(var(--accent-tint));">
+              <span style="color:hsl(var(--accent-strong));">{{ q.icon }}</span>{{ q.name }}
+            </button>
+          </sc-for>
+        </div>
+        <!-- two columns -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div style="background:#fff; border-radius:20px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:20px;">
+            <div style="font-size:13px; font-weight:600; margin-bottom:16px;">Presupuestos del mes</div>
+            <sc-for list="{{ finBudgets }}" as="b" hint-placeholder-count="3">
+              <div style="margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+                  <span style="display:flex; align-items:center; gap:8px; font-size:13px;"><span style="height:9px; width:9px; border-radius:999px; background:{{ b.dot }};"></span>{{ b.name }}</span>
+                  <span style="font-size:12px; color:#8b9089; font-variant-numeric:tabular-nums;">{{ b.amounts }}</span>
+                </div>
+                <div style="height:6px; border-radius:999px; background:rgba(0,0,0,.06); overflow:hidden;">
+                  <div style="height:100%; border-radius:999px; width:{{ b.pct }}; background:{{ b.bar }};"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#fff; border-radius:20px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:20px;">
+            <div style="font-size:13px; font-weight:600; margin-bottom:8px;">Movimientos recientes</div>
+            <sc-for list="{{ finTxns }}" as="t" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 0; border-top:1px solid rgba(0,0,0,.045);">
+                <div style="min-width:0;">
+                  <div style="font-size:13.5px; color:#1f2421; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ t.desc }}</div>
+                  <div style="font-size:11px; color:#8b9089;">{{ t.meta }}</div>
+                </div>
+                <div style="font-size:13.5px; font-weight:500; font-variant-numeric:tabular-nums; white-space:nowrap; {{ t.color }}">{{ t.amount }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ SECCIÓN 3 · INICIO ════════ -->
+    <div style="display:flex; align-items:center; gap:10px; margin:52px 0 18px;">
+      <span style="font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:#8b9089;">3 · Inicio con widgets reales</span>
+      <span style="flex:1; height:1px; background:rgba(0,0,0,.08);"></span>
+    </div>
+
+    <div style="background:#fbfbf8; border-radius:24px; border:1px solid rgba(0,0,0,.05); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:34px 36px;">
+      <p style="margin:0; font-size:14px; color:#525853;">Buenos días,</p>
+      <h2 style="margin:2px 0 26px; font-size:38px; font-weight:600; letter-spacing:-.025em; line-height:1.05;">Bienvenido, <span style="color:hsl(var(--accent-strong));">Andreu</span>.</h2>
+
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; align-items:start;">
+        <!-- Próximos eventos -->
+        <div style="background:#fff; border-radius:22px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <span style="font-size:13px; font-weight:600;">Próximos eventos</span>
+            <span style="color:#b3b8b1;">{{ icChevron }}</span>
+          </div>
+          <sc-for list="{{ wEvents }}" as="e" hint-placeholder-count="3">
+            <div style="display:flex; gap:11px; align-items:flex-start; padding:8px 0; border-top:1px solid rgba(0,0,0,.045);">
+              <span style="height:9px; width:9px; border-radius:999px; margin-top:5px; background:{{ e.dot }}; flex-shrink:0;"></span>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:13.5px; color:#1f2421;">{{ e.title }}</div>
+                <div style="font-size:11.5px; color:#8b9089;">{{ e.when }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- Tareas de hoy -->
+        <div style="background:#fff; border-radius:22px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+            <span style="font-size:13px; font-weight:600;">Tareas de hoy</span>
+            <span style="font-size:12px; color:#8b9089; font-variant-numeric:tabular-nums;">3/6</span>
+          </div>
+          <div style="height:6px; border-radius:999px; background:rgba(0,0,0,.06); overflow:hidden; margin-bottom:14px;">
+            <div style="height:100%; width:50%; border-radius:999px; background:hsl(var(--accent));"></div>
+          </div>
+          <sc-for list="{{ wTasks }}" as="t" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
+              <span style="{{ t.boxStyle }}">{{ t.check }}</span>
+              <span style="font-size:13.5px; {{ t.textStyle }}">{{ t.name }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- Despensa -->
+        <div style="background:#fff; border-radius:22px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <span style="font-size:13px; font-weight:600;">Despensa</span>
+            <span style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; padding:3px 9px; border-radius:999px; background:hsl(var(--accent-tint)); color:hsl(var(--accent-strong));">4 por reponer</span>
+          </div>
+          <sc-for list="{{ wPantry }}" as="p" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:7px 0; border-top:1px solid rgba(0,0,0,.045);">
+              <span style="font-size:13.5px; color:#1f2421;">{{ p.name }}</span>
+              <span style="font-size:11.5px; color:{{ p.color }};">{{ p.level }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- Finanzas mini -->
+        <div style="background:#fff; border-radius:22px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:20px;">
+          <div style="font-size:13px; font-weight:600; margin-bottom:14px;">Finanzas del mes</div>
+          <div style="font-size:11px; color:#8b9089; text-transform:uppercase; letter-spacing:.05em;">Saldo disponible</div>
+          <div style="font-size:26px; font-weight:600; letter-spacing:-.01em; margin:2px 0 14px; font-variant-numeric:tabular-nums;">$2.345.900</div>
+          <div style="display:flex; gap:10px;">
+            <div style="flex:1; background:#f4f4ef; border-radius:14px; padding:10px 12px;">
+              <div style="font-size:11px; color:#8b9089;">Ingresos</div>
+              <div style="font-size:14px; font-weight:600; color:#16895a; font-variant-numeric:tabular-nums;">$2.77M</div>
+            </div>
+            <div style="flex:1; background:#f4f4ef; border-radius:14px; padding:10px 12px;">
+              <div style="font-size:11px; color:#8b9089;">Gastos</div>
+              <div style="font-size:14px; font-weight:600; color:#d2553f; font-variant-numeric:tabular-nums;">$1.98M</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hábitos -->
+        <div style="background:#fff; border-radius:22px; border:1px solid rgba(0,0,0,.04); box-shadow:0 1px 2px rgba(20,28,24,.04); padding:20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <span style="font-size:13px; font-weight:600;">Hábitos</span>
+            <span style="font-size:11.5px; color:#8b9089;">racha 5 días</span>
+          </div>
+          <sc-for list="{{ wHabits }}" as="h" hint-placeholder-count="3">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:13px;">
+              <span style="font-size:13px; flex:1;">{{ h.name }}</span>
+              <span style="display:flex; gap:5px;">
+                <sc-for list="{{ h.days }}" as="d" hint-placeholder-count="7">
+                  <span style="height:16px; width:16px; border-radius:5px; background:{{ d.bg }};"></span>
+                </sc-for>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- Cena de hoy -->
+        <div style="background:hsl(var(--accent-tint)); border-radius:22px; border:1px solid rgba(0,0,0,.04); padding:20px; display:flex; flex-direction:column;">
+          <div style="font-size:11px; color:hsl(var(--accent-strong)); text-transform:uppercase; letter-spacing:.06em; font-weight:600;">Cena de hoy</div>
+          <div style="font-size:19px; font-weight:600; letter-spacing:-.01em; margin:6px 0 4px;">Pasta al pesto</div>
+          <div style="font-size:12.5px; color:#525853; line-height:1.45;">25 min · tienes todos los ingredientes en la despensa.</div>
+          <button style="align-self:flex-start; margin-top:16px; display:flex; align-items:center; gap:7px; padding:9px 15px; border-radius:999px; border:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:500; background:hsl(var(--accent)); color:hsl(var(--accent-strong));">
+            Ver receta {{ icArrow }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1300,&quot;height&quot;:900},&quot;palette&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;sage&quot;,&quot;lavender&quot;,&quot;peach&quot;,&quot;sky&quot;,&quot;clay&quot;],&quot;default&quot;:&quot;sage&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const PALETTES = {
+  sage:     { accent:'150 38% 76%', strong:'152 30% 38%', tint:'150 50% 95%' },
+  lavender: { accent:'265 45% 82%', strong:'263 32% 50%', tint:'265 55% 96%' },
+  peach:    { accent:'22 78% 84%',  strong:'20 55% 50%',  tint:'22 80% 96%'  },
+  sky:      { accent:'205 65% 78%', strong:'207 52% 40%', tint:'205 65% 96%' },
+  clay:     { accent:'14 52% 76%',  strong:'12 44% 44%',  tint:'14 56% 95%'  },
+};
+
+// ── icon helpers ──
+function SVG(children, size) {
+  return React.createElement('svg', { viewBox:'0 0 24 24', fill:'none', stroke:'currentColor',
+    strokeWidth:1.6, strokeLinecap:'round', strokeLinejoin:'round', width:size||20, height:size||20,
+    style:{ flexShrink:0 } }, children);
+}
+function P(d, i){ return React.createElement('path', { d, key:i }); }
+const IC = {
+  home:    (s)=>SVG([P('M3.5 10.5 12 3.5l8.5 7',1),P('M5 9.5V20a.5.5 0 0 0 .5.5H9.5V14h5v6.5h4a.5.5 0 0 0 .5-.5V9.5',2)],s),
+  cal:     (s)=>SVG([React.createElement('rect',{key:1,x:'3.5',y:'5',width:'17',height:'15.5',rx:'3'}),P('M3.5 9.5h17M8 3.5v3M16 3.5v3',2)],s),
+  tasks:   (s)=>SVG([React.createElement('rect',{key:1,x:'4',y:'4',width:'16',height:'16',rx:'4'}),P('m8.5 12 2.4 2.4L15.8 9.5',2)],s),
+  habit:   (s)=>SVG([P('M4 12a8 8 0 0 1 13.7-5.6L20 8.5',1),P('M20 4v4.5h-4.5',2),P('M20 12a8 8 0 0 1-13.7 5.6L4 15.5',3),P('M4 20v-4.5h4.5',4)],s),
+  hammer:  (s)=>SVG([P('M12.5 9 4.7 16.8a1.9 1.9 0 0 0 2.7 2.7L15.2 11.7',1),P('M16 14.5 19.5 11',2),P('M18.7 11.8 14 7.1a4.4 4.4 0 0 0-3.1-1.3H8.6l.9.8a4.9 4.9 0 0 1 1.6 3.6V11l1.6 1.6h.7a2.6 2.6 0 0 1 1.8.7l1 1',3)],s),
+  cinema:  (s)=>SVG([React.createElement('rect',{key:1,x:'3.5',y:'6',width:'17',height:'13',rx:'2.5'}),P('M3.5 9.5h17M7 6V3.5M11 6V3.5M15 6V3.5M19 6V3.5',2),React.createElement('path',{key:3,d:'M10.5 12.2v4.6l4-2.3z',fill:'currentColor',stroke:'none'})],s),
+  heart:   (s)=>SVG([P('M12 20C5.5 15.5 3 11.8 3 8.7 3 6.1 5 4.5 7.2 4.5c1.6 0 3 .9 3.8 2.2.8-1.3 2.2-2.2 3.8-2.2C19 4.5 21 6.1 21 8.7c0 3.1-2.5 6.8-9 11.3Z',1)],s),
+  wallet:  (s)=>SVG([P('M3.5 8.5h14a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-13a1 1 0 0 1-1-1V8.5Z',1),P('M3.5 8.5V7a2 2 0 0 1 2-2h11',2),React.createElement('circle',{key:3,cx:'16.5',cy:'14.5',r:'1.1',fill:'currentColor'})],s),
+  food:    (s)=>SVG([P('M4 14c2-6 7-9 16-9-1 9-5 14-12 14a3.5 3.5 0 0 1-3.5-3.5',1),P('M4.5 19.5C8 16 12 13.5 18 11.5',2)],s),
+  barbell: (s)=>SVG([React.createElement('rect',{key:1,x:'2.5',y:'9.2',width:'2.4',height:'5.6',rx:'1'}),React.createElement('rect',{key:2,x:'4.9',y:'7.6',width:'2.4',height:'8.8',rx:'1'}),React.createElement('rect',{key:3,x:'16.7',y:'7.6',width:'2.4',height:'8.8',rx:'1'}),React.createElement('rect',{key:4,x:'19.1',y:'9.2',width:'2.4',height:'5.6',rx:'1'}),P('M7.3 12h9.4',5)],s),
+  droplet: (s)=>SVG([P('M12 3.5c3.6 4.1 6 7.1 6 10.1a6 6 0 0 1-12 0c0-3 2.4-6 6-10.1Z',1)],s),
+  mood:    (s)=>SVG([React.createElement('circle',{key:1,cx:'12',cy:'12',r:'8.5'}),P('M8.4 13.8c.8 1.3 2.1 2 3.6 2s2.8-.7 3.6-2',2),React.createElement('circle',{key:3,cx:'9',cy:'9.8',r:'.95',fill:'currentColor',stroke:'none'}),React.createElement('circle',{key:4,cx:'15',cy:'9.8',r:'.95',fill:'currentColor',stroke:'none'})],s),
+  chart:   (s)=>SVG([P('M4 4v16h16',1),React.createElement('rect',{key:2,x:'7.5',y:'12',width:'2.8',height:'5',rx:'1'}),React.createElement('rect',{key:3,x:'12.6',y:'8.5',width:'2.8',height:'8.5',rx:'1'}),React.createElement('rect',{key:4,x:'17.7',y:'5.5',width:'2.8',height:'11.5',rx:'1'})],s),
+  chevron: (s)=>SVG([P('m6 9 6 6 6-6',1)],s||16),
+  arrow:   (s)=>SVG([P('M5 12h14M13 6l6 6-6 6',1)],s||18),
+  external:(s)=>SVG([P('M14 5h5v5M19 5l-7 7',1),P('M18 13v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4',2)],s||16),
+  card:    (s)=>SVG([React.createElement('rect',{key:1,x:'3',y:'6',width:'18',height:'13',rx:'2.5'}),P('M3 10h18M7 15h3',2)],s),
+  budget:  (s)=>SVG([React.createElement('circle',{key:1,cx:'12',cy:'12',r:'8.5'}),P('M12 7v5l3 2',2)],s),
+  list:    (s)=>SVG([P('M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01',1)],s),
+  recurring:(s)=>SVG([P('M4 12a8 8 0 0 1 13.7-5.6L20 8.5',1),P('M20 4v4.5h-4.5',2)],s),
+  inUp:    (s)=>SVG([P('M12 19V5M6 11l6-6 6 6',1)],s||18),
+  outDown: (s)=>SVG([P('M12 5v14M6 13l6 6 6-6',1)],s||18),
+  scale:   (s)=>SVG([P('M4 7h16M7 7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V7M10 11h4M10 14.5h4',1)],s||18),
+  check:   (s)=>SVG([P('m5 12 4.5 4.5L19 7',1)],s||13),
+};
+
+// ── nav data ──
+const GENERAL = [
+  { id:'inicio',     name:'Inicio',     icon:IC.home,   title:'Inicio',     crumb:'General' },
+  { id:'calendario', name:'Calendario', icon:IC.cal,    title:'Calendario', crumb:'General' },
+  { id:'tareas',     name:'Tareas',     icon:IC.tasks,  title:'Tareas',     crumb:'General' },
+  { id:'habitos',    name:'Hábitos',    icon:IC.habit,  title:'Hábitos',    crumb:'General' },
+  { id:'proyectos',  name:'Proyectos',  icon:IC.hammer, title:'Proyectos',  crumb:'General' },
+  { id:'cine',       name:'Cine',       icon:IC.cinema, title:'Cine',       crumb:'General' },
+];
+const SALUD = [
+  { id:'salud',       name:'Resumen',       title:'Salud',         crumb:'Salud' },
+  { id:'salud-fis',   name:'Estado físico', title:'Estado físico', crumb:'Salud', badge:'Pronto' },
+  { id:'alimentacion',name:'Alimentación',  title:'Alimentación',  crumb:'Salud' },
+  { id:'salud-con',   name:'Consumo',       title:'Consumo',       crumb:'Salud', badge:'Pronto' },
+  { id:'salud-emo',   name:'Emociones',     title:'Emociones',     crumb:'Salud', badge:'Pronto' },
+];
+const FINANZAS = [
+  { id:'finanzas',  name:'Resumen',      title:'Finanzas',     crumb:'Finanzas' },
+  { id:'fin-tar',   name:'Tarjetas',     title:'Tarjetas',     crumb:'Finanzas' },
+  { id:'fin-pre',   name:'Presupuestos', title:'Presupuestos', crumb:'Finanzas' },
+  { id:'fin-mov',   name:'Movimientos',  title:'Movimientos',  crumb:'Finanzas' },
+  { id:'fin-gas',   name:'Gastos fijos', title:'Gastos fijos', crumb:'Finanzas' },
+  { id:'fin-per',   name:'Personal',     title:'Personal',     crumb:'Finanzas', badge:'Privado' },
+];
+const META = {};
+[...GENERAL, ...SALUD, ...FINANZAS].forEach(i => { META[i.id] = i; });
+
+const ROW_BASE = 'position:relative; display:flex; align-items:center; gap:12px; width:100%; padding:10px 12px; border-radius:16px; border:none; background:none; cursor:pointer; font-size:14px; color:#525853; font-family:inherit; text-align:left; transition:background .12s,color .12s;';
+const ROW_ACTIVE = 'position:relative; display:flex; align-items:center; gap:12px; width:100%; padding:10px 12px; border-radius:16px; border:none; cursor:pointer; font-size:14px; font-family:inherit; text-align:left; background:hsl(var(--accent-tint)); color:hsl(var(--accent-strong)); font-weight:500;';
+const CHILD_BASE = 'position:relative; display:flex; align-items:center; justify-content:space-between; width:100%; padding:8px 12px; border-radius:12px; border:none; background:none; cursor:pointer; font-size:13.5px; color:#525853; font-family:inherit; text-align:left; transition:background .12s,color .12s;';
+const CHILD_ACTIVE = 'position:relative; display:flex; align-items:center; justify-content:space-between; width:100%; padding:8px 12px; border-radius:12px; border:none; cursor:pointer; font-size:13.5px; font-family:inherit; text-align:left; background:hsl(var(--accent-tint)); color:hsl(var(--accent-strong)); font-weight:500;';
+const HEAD_BASE = 'position:relative; display:flex; align-items:center; gap:12px; width:100%; padding:10px 12px; border-radius:16px; border:none; background:none; cursor:pointer; font-size:14px; color:#1f2421; font-weight:500; font-family:inherit; transition:background .12s;';
+const BADGE_STYLE = 'font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; padding:2px 7px; border-radius:999px; background:#f4f4ef; color:#8b9089;';
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.rootRef = React.createRef();
+    this.state = {
+      palette: props.palette || 'sage',
+      aActive:'inicio', aSaludOpen:true, aFinOpen:false,
+    };
+  }
+  componentDidMount(){ this.applyPalette(); }
+  componentDidUpdate(prev){
+    if (prev.palette !== this.props.palette && this.props.palette && this.props.palette !== this.state.palette) {
+      this.setState({ palette: this.props.palette });
+    }
+    this.applyPalette();
+  }
+  applyPalette(){
+    const el = this.rootRef.current; if (!el) return;
+    const p = PALETTES[this.state.palette] || PALETTES.sage;
+    el.style.setProperty('--accent', p.accent);
+    el.style.setProperty('--accent-strong', p.strong);
+    el.style.setProperty('--accent-tint', p.tint);
+  }
+
+  mkRow(list, activeId, onPick){
+    return list.map(i => ({
+      ...i, active: i.id === activeId,
+      rowStyle: i.id === activeId ? ROW_ACTIVE : ROW_BASE,
+      icon: i.icon ? i.icon(20) : null,
+      onClick: () => onPick(i.id),
+    }));
+  }
+  mkChildren(list, activeId, onPick){
+    return list.map(i => ({
+      ...i, active: i.id === activeId,
+      childStyle: i.id === activeId ? CHILD_ACTIVE : CHILD_BASE,
+      badgeStyle: BADGE_STYLE,
+      onClick: () => onPick(i.id),
+    }));
+  }
+
+  renderVals(){
+    const S = this.state;
+    const aPick = (id) => this.setState({ aActive:id });
+    const aMeta = META[S.aActive] || {};
+
+    const palettes = Object.keys(PALETTES).map(name => ({
+      name, swatch:`hsl(${PALETTES[name].accent})`,
+      border: S.palette===name ? `hsl(${PALETTES[name].strong})` : 'rgba(0,0,0,.08)',
+      shadow: S.palette===name ? '0 0 0 1px '+`hsl(${PALETTES[name].strong})` : '0 1px 2px rgba(20,28,24,.04)',
+      onClick: () => this.setState({ palette:name }),
+    }));
+
+    return {
+      rootRef: this.rootRef,
+      palettes,
+
+      // Menú acordeón
+      aGeneral: this.mkRow(GENERAL, S.aActive, aPick),
+      aSaludChildren: this.mkChildren(SALUD, S.aActive, aPick),
+      aFinChildren: this.mkChildren(FINANZAS, S.aActive, aPick),
+      aSaludOpen: S.aSaludOpen, aFinOpen: S.aFinOpen,
+      aSaludHeadStyle: HEAD_BASE, aFinHeadStyle: HEAD_BASE,
+      aSaludChevStyle: 'display:flex; color:#b3b8b1; transition:transform .2s; transform:rotate('+(S.aSaludOpen?'0':'-90deg')+');',
+      aFinChevStyle: 'display:flex; color:#b3b8b1; transition:transform .2s; transform:rotate('+(S.aFinOpen?'0':'-90deg')+');',
+      toggleASalud: () => this.setState(s=>({ aSaludOpen:!s.aSaludOpen })),
+      toggleAFinanzas: () => this.setState(s=>({ aFinOpen:!s.aFinOpen })),
+      icHeart: IC.heart(20), icWallet: IC.wallet(20), icChevron: IC.chevron(16),
+      icChart: IC.chart(20), icExternal: IC.external(16), icArrow: IC.arrow(16),
+      aCrumb: aMeta.crumb || '', aTitle: aMeta.title || '',
+
+      // ── Salud dashboard ──
+      saludMetrics: [
+        { icon:IC.barbell(16), label:'Actividad', value:'7.420', sub:'pasos hoy · meta 8.000' },
+        { icon:IC.droplet(16), label:'Hidratación', value:'1.4 L', sub:'de 2 L recomendados' },
+        { icon:IC.mood(16),    label:'Ánimo', value:'Bien', sub:'registrado a las 9:00' },
+      ],
+      saludCards: [
+        { icon:IC.barbell(22), name:'Estado físico', hint:'3 entrenamientos esta semana.', tag:'Activo', tagStyle:this.tag(true) },
+        { icon:IC.food(22),    name:'Alimentación',  hint:'Despensa, recetas y plan de comidas.', tag:'Ver →', tagStyle:this.tag('shortcut') },
+        { icon:IC.droplet(22), name:'Consumo',       hint:'Azúcar · alcohol · pantallas.', tag:'Pronto', tagStyle:this.tag(false) },
+        { icon:IC.mood(22),    name:'Emociones',     hint:'Registro de ánimo diario.', tag:'Pronto', tagStyle:this.tag(false) },
+      ],
+
+      // ── Finanzas dashboard ──
+      finMetrics: [
+        { icon:IC.wallet(15), label:'Saldo', value:'$2.345.900', sub:'Banco Estado ···· 4821', valueColor:'' },
+        { icon:IC.inUp(15),   label:'Ingresos', value:'$2.770.000', sub:'junio · todo el hogar', valueColor:'color:#16895a;' },
+        { icon:IC.outDown(15),label:'Gastos', value:'$1.984.300', sub:'ejecutado + comprometido', valueColor:'color:#d2553f;' },
+        { icon:IC.scale(15),  label:'Balance', value:'+$785.700', sub:'ingresos − gastos', valueColor:'color:#16895a;' },
+      ],
+      finQuick: [
+        { icon:IC.card(18), name:'Tarjetas' },
+        { icon:IC.budget(18), name:'Presupuestos' },
+        { icon:IC.list(18), name:'Movimientos' },
+        { icon:IC.recurring(18), name:'Gastos fijos' },
+      ],
+      finBudgets: [
+        { name:'Mercado', amounts:'$248.900 / $400.000', pct:'62%', dot:'#f0a868', bar:'#86c79a' },
+        { name:'Restaurantes', amounts:'$121.300 / $150.000', pct:'81%', dot:'#e08a6a', bar:'#e6c14d' },
+        { name:'Ocio', amounts:'$98.500 / $100.000', pct:'98%', dot:'#cf7ab0', bar:'#d97a6a' },
+      ],
+      finTxns: [
+        { desc:'Sueldo Mamá', meta:'2 jun · Sueldo', amount:'+$1.850.000', color:'color:#16895a;' },
+        { desc:'Arriendo', meta:'5 jun · Vivienda', amount:'-$720.000', color:'color:#d2553f;' },
+        { desc:'Mercado Jumbo', meta:'17 jun · Mercado', amount:'-$102.110', color:'color:#d2553f;' },
+        { desc:'Cena Don Tito', meta:'6 jun · Restaurantes', amount:'-$34.500', color:'color:#d2553f;' },
+      ],
+
+      // ── Inicio widgets ──
+      wEvents: [
+        { dot:'#86c79a', title:'Dentista — Mateo', when:'Hoy · 17:30' },
+        { dot:'#cf9ad9', title:'Pago arriendo', when:'Mañana' },
+        { dot:'#f0a868', title:'Cumpleaños abuela', when:'Sáb · todo el día' },
+      ],
+      wTasks: [
+        { name:'Sacar la basura', done:true },
+        { name:'Comprar pan', done:true },
+        { name:'Llamar al gasfíter', done:true },
+        { name:'Regar las plantas', done:false },
+      ].map(t => ({
+        name:t.name,
+        boxStyle: t.done
+          ? 'height:20px; width:20px; border-radius:7px; background:hsl(var(--accent)); color:hsl(var(--accent-strong)); display:flex; align-items:center; justify-content:center; flex-shrink:0;'
+          : 'height:20px; width:20px; border-radius:7px; border:1.5px solid rgba(0,0,0,.18); flex-shrink:0;',
+        check: t.done ? IC.check(13) : null,
+        textStyle: t.done ? 'color:#8b9089; text-decoration:line-through;' : 'color:#1f2421;',
+      })),
+      wPantry: [
+        { name:'Leche', level:'Quedan 1', color:'#d2553f' },
+        { name:'Huevos', level:'Pocos', color:'#e0863f' },
+        { name:'Café', level:'Por acabar', color:'#e0863f' },
+        { name:'Arroz', level:'Suficiente', color:'#8b9089' },
+      ],
+      wHabits: [
+        { name:'Ejercicio', days:this.habitDays([1,1,0,1,1,1,0]) },
+        { name:'Leer', days:this.habitDays([1,1,1,1,0,1,1]) },
+        { name:'Meditar', days:this.habitDays([0,1,1,1,1,0,0]) },
+      ],
+    };
+  }
+
+  tag(kind){
+    if (kind === true)  return 'font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; padding:3px 9px; border-radius:999px; background:hsl(var(--accent-tint)); color:hsl(var(--accent-strong));';
+    if (kind === 'shortcut') return 'font-size:11px; font-weight:500; padding:3px 9px; border-radius:999px; color:hsl(var(--accent-strong));';
+    return 'font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; padding:3px 9px; border-radius:999px; background:#f4f4ef; color:#8b9089;';
+  }
+  habitDays(arr){
+    return arr.map((v,i) => ({ key:i, bg: v ? 'hsl(var(--accent))' : 'rgba(0,0,0,.07)' }));
+  }
+}
+</script>
+</body>
+</html>
