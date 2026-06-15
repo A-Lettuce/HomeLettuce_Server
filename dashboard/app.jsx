@@ -1,29 +1,66 @@
 // Home Lettuce — App shell + router
 
+// ── nav plano (para BottomNav y fallback) ──────────────────
 const NAV = [
-  { id: 'inicio',       label: 'Inicio',       Icon: IconHome,       section: 'main' },
-  { id: 'calendario',   label: 'Calendario',   Icon: IconCalendar,   section: 'main' },
-  { id: 'tareas',       label: 'Tareas',       Icon: IconTasks,      section: 'main' },
-  { id: 'habitos',      label: 'Hábitos',      Icon: IconHabit,      section: 'main' },
-  { id: 'proyectos',    label: 'Proyectos',    Icon: IconHammer,     section: 'main' },
-  { id: 'alimentacion', label: 'Alimentación', Icon: IconFood,       section: 'life' },
-  { id: 'finanzas',     label: 'Finanzas',     Icon: IconFinance,    section: 'life' },
-  { id: 'cine',         label: 'Cine',         Icon: IconCinema,     section: 'life' },
-  { id: 'salud',        label: 'Salud',        Icon: IconHeart,      section: 'health' },
-  { id: 'vantop',       label: 'Vantop Panel', Icon: IconChartBar,   section: 'work',
+  { id: 'inicio',     label: 'Inicio',       Icon: IconHome,    section: 'main' },
+  { id: 'calendario', label: 'Calendario',   Icon: IconCalendar, section: 'main' },
+  { id: 'tareas',     label: 'Tareas',       Icon: IconTasks,   section: 'main' },
+  { id: 'habitos',    label: 'Hábitos',      Icon: IconHabit,   section: 'main' },
+  { id: 'proyectos',  label: 'Proyectos',    Icon: IconHammer,  section: 'main' },
+  { id: 'cine',        label: 'Cine',         Icon: IconCinema,  section: 'leisure' },
+  { id: 'musica',     label: 'Música',       Icon: IconMusic,   section: 'leisure' },
+  { id: 'salud',      label: 'Salud',        Icon: IconHeart,   section: 'health' },
+  { id: 'finanzas',   label: 'Finanzas',     Icon: IconFinance, section: 'life' },
+  { id: 'vantop',     label: 'Vantop Panel', Icon: IconChartBar, section: 'work',
     href: 'https://home-lettuce.com/vantop-dashboard', external: true },
 ];
 
+// ── sub-navs de acordeón ────────────────────────────────────
+const SALUD_SUBNAV = [
+  { id: 'salud',        label: 'Resumen' },
+  { id: 'salud-fis',    label: 'Estado físico', badge: 'Pronto' },
+  { id: 'alimentacion', label: 'Alimentación' },
+  { id: 'salud-con',    label: 'Consumo',       badge: 'Pronto' },
+  { id: 'salud-emo',    label: 'Emociones',     badge: 'Pronto' },
+];
+
+const FIN_SUBNAV = [
+  { id: 'finanzas', label: 'Resumen' },
+  { id: 'fin-tar',  label: 'Tarjetas' },
+  { id: 'fin-pre',  label: 'Presupuestos' },
+  { id: 'fin-mov',  label: 'Movimientos' },
+  { id: 'fin-gas',  label: 'Gastos fijos' },
+  { id: 'fin-per',  label: 'Personal',    badge: 'Privado' },
+];
+
+const TL_SUBNAV = [
+  { id: 'cine',   label: 'Cine' },
+  { id: 'musica', label: 'Música', badge: 'Próximamente' },
+];
+
+const SALUD_IDS = new Set(SALUD_SUBNAV.map(i => i.id));
+const FIN_IDS   = new Set(FIN_SUBNAV.map(i => i.id));
+const TL_IDS    = new Set(TL_SUBNAV.map(i => i.id));
+
 const PAGE_META = {
-  inicio:       { title: 'Inicio',       subtitle: 'Tu panel de bienvenida. Pronto podrás añadir aquí widgets personalizados.' },
-  calendario:   { title: 'Calendario',   subtitle: 'Aquí verás tus próximos eventos y podrás organizar tu agenda.' },
-  tareas:       { title: 'Tareas',       subtitle: 'Una lista limpia para lo que tienes que hacer hoy y esta semana.' },
-  habitos:      { title: 'Hábitos',      subtitle: 'Define tus rutinas y haz seguimiento día a día.' },
-  proyectos:    { title: 'Proyectos',    subtitle: 'Iniciativas del hogar con tareas, presupuesto y avance.' },
-  alimentacion: { title: 'Alimentación', subtitle: 'Despensa, recetas y planificación de comidas para la casa.' },
-  finanzas:     { title: 'Finanzas',     subtitle: 'Gastos, ingresos y suscripciones — todo en un solo sitio.' },
-  cine:         { title: 'Cine',         subtitle: 'Tu lista de películas y series para ver con calma.' },
-  salud:        { title: 'Salud',        subtitle: 'Seguimiento de bienestar físico, emocional y hábitos de consumo.' },
+  inicio:       { title: 'Inicio',        subtitle: 'Tu panel de bienvenida.' },
+  calendario:   { title: 'Calendario',    subtitle: 'Aquí verás tus próximos eventos y podrás organizar tu agenda.' },
+  tareas:       { title: 'Tareas',        subtitle: 'Una lista limpia para lo que tienes que hacer hoy y esta semana.' },
+  habitos:      { title: 'Hábitos',       subtitle: 'Define tus rutinas y haz seguimiento día a día.' },
+  proyectos:    { title: 'Proyectos',     subtitle: 'Iniciativas del hogar con tareas, presupuesto y avance.' },
+  alimentacion: { title: 'Alimentación',  subtitle: 'Despensa, recetas y planificación de comidas para la casa.' },
+  finanzas:     { title: 'Finanzas',      subtitle: 'Gastos, ingresos y suscripciones — todo en un solo sitio.' },
+  cine:         { title: 'Cine',          subtitle: 'Tu lista de películas y series para ver con calma.' },
+  musica:       { title: 'Música',        subtitle: 'Tus playlists y colección musical.' },
+  salud:        { title: 'Salud',         subtitle: 'Seguimiento de bienestar físico, emocional y hábitos de consumo.' },
+  'salud-fis':  { title: 'Estado físico', subtitle: 'Actividad, descanso y energía día a día.' },
+  'salud-con':  { title: 'Consumo',       subtitle: 'Seguimiento de consumo de azúcar, alcohol, pantallas y más.' },
+  'salud-emo':  { title: 'Emociones',     subtitle: 'Registro de ánimo y salud mental.' },
+  'fin-tar':    { title: 'Tarjetas',      subtitle: 'Resumen de tus tarjetas y cuentas.' },
+  'fin-pre':    { title: 'Presupuestos',  subtitle: 'Gestión de presupuestos por categoría.' },
+  'fin-mov':    { title: 'Movimientos',   subtitle: 'Historial de transacciones del hogar.' },
+  'fin-gas':    { title: 'Gastos fijos',  subtitle: 'Gastos recurrentes y suscripciones.' },
+  'fin-per':    { title: 'Personal',      subtitle: 'Tus finanzas personales (privado).' },
 };
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -48,11 +85,18 @@ function useDarkMode() {
   return [dark, setDark];
 }
 
-// ─── icono hamburguesa (sólo aquí) ─────────────────────────
+// ─── iconos locales ────────────────────────────────────────
 const IconMenu = (p) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
        strokeLinecap="round" strokeLinejoin="round" width="20" height="20" {...p}>
     <path d="M4 7h16M4 12h16M4 17h16"/>
+  </svg>
+);
+
+const IconChevronDown = (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
+       strokeLinecap="round" strokeLinejoin="round" width="16" height="16" {...p}>
+    <path d="m6 9 6 6 6-6"/>
   </svg>
 );
 
@@ -140,83 +184,7 @@ function UserMenu({ username, email, onLogout }) {
   );
 }
 
-// ─── Side menu (desktop) ───────────────────────────────────
-function SideMenu({ current, onNavigate, open, onClose }) {
-  const main = NAV.filter(n => n.section === 'main');
-  const life = NAV.filter(n => n.section === 'life');
-  const health = NAV.filter(n => n.section === 'health');
-  const work = NAV.filter(n => n.section === 'work');
-
-  // Cierra el drawer al pulsar Escape
-  React.useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => { if (e.key === 'Escape') onClose && onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-
-  // En el drawer, navegar también lo cierra
-  const navAnd = (id) => { onNavigate(id); onClose && onClose(); };
-
-  const groups = (handler) => (
-    <React.Fragment>
-      <NavGroup label="General" items={main} current={current} onNavigate={handler}/>
-      <div className="my-3 mx-3 h-px bg-black/[.06] dark:bg-white/[.06]"/>
-      <NavGroup label="Vida diaria" items={life} current={current} onNavigate={handler}/>
-      <div className="my-3 mx-3 h-px bg-black/[.06] dark:bg-white/[.06]"/>
-      <NavGroup label="Salud" items={health} current={current} onNavigate={handler}/>
-      <div className="my-3 mx-3 h-px bg-black/[.06] dark:bg-white/[.06]"/>
-      <NavGroup label="Trabajo" items={work} current={current} onNavigate={handler}/>
-    </React.Fragment>
-  );
-
-  return (
-    <React.Fragment>
-      {/* Desktop — estático (sin cambios de comportamiento) */}
-      <aside className="hidden md:flex flex-col w-60 lg:w-64 shrink-0 px-3 py-6 gap-1">
-        {groups(onNavigate)}
-      </aside>
-
-      {/* Móvil — drawer lateral con overlay oscuro */}
-      <div className={`md:hidden fixed inset-0 z-50 ${open ? '' : 'pointer-events-none'}`}
-           aria-hidden={!open}>
-        <div onClick={onClose}
-             className={`absolute inset-0 bg-black/40 transition-opacity duration-300
-                         ${open ? 'opacity-100' : 'opacity-0'}`}/>
-        <aside
-          role="dialog" aria-modal="true" aria-label="Menú de navegación"
-          className={`absolute left-0 top-0 bottom-0 w-72 max-w-[82vw]
-                      bg-paper dark:bg-night shadow-xl
-                      border-r border-black/[.06] dark:border-white/[.06]
-                      flex flex-col transition-transform duration-300 ease-out
-                      ${open ? 'translate-x-0' : '-translate-x-full'}`}>
-          <div className="h-14 px-4 flex items-center justify-between shrink-0
-                          border-b border-black/[.05] dark:border-white/[.05]">
-            <div className="flex items-center gap-2.5">
-              <LettuceMark size={24}/>
-              <span className="text-[15px] font-medium tracking-tight text-ink dark:text-night-text">
-                Home Lettuce
-              </span>
-            </div>
-            <button onClick={onClose} aria-label="Cerrar menú"
-              className="h-9 w-9 rounded-full flex items-center justify-center
-                         text-ink-soft dark:text-night-softText
-                         hover:bg-paper-soft dark:hover:bg-night-soft transition-colors">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
-                   strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
-                <path d="m6 6 12 12M18 6 6 18"/>
-              </svg>
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-3 py-4">
-            {groups(navAnd)}
-          </div>
-        </aside>
-      </div>
-    </React.Fragment>
-  );
-}
-
+// ─── NavGroup (sección plana) ──────────────────────────────
 function NavGroup({ label, items, current, onNavigate }) {
   return (
     <div>
@@ -265,13 +233,146 @@ function NavGroup({ label, items, current, onNavigate }) {
   );
 }
 
+// ─── NavAccordion (categoría con hijos) ───────────────────
+function NavAccordion({ label, Icon, items, current, onNavigate }) {
+  const isChildActive = items.some(i => i.id === current);
+  const [open, setOpen] = React.useState(isChildActive);
+
+  React.useEffect(() => {
+    if (isChildActive) setOpen(true);
+  }, [isChildActive]);
+
+  return (
+    <div className="space-y-0.5">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`w-full flex items-center gap-3 pl-3 pr-2 py-2.5 rounded-2xl
+                    text-[14px] transition-colors
+                    ${isChildActive
+                      ? 'text-ink dark:text-night-text font-medium'
+                      : 'text-ink-soft dark:text-night-softText hover:bg-paper-soft dark:hover:bg-night-soft hover:text-ink dark:hover:text-night-text'}`}>
+        <Icon/>
+        <span className="flex-1 text-left">{label}</span>
+        <span style={{ display:'flex', transition:'transform .2s', transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
+          <IconChevronDown/>
+        </span>
+      </button>
+
+      {open && (
+        <div className="ml-[22px] pl-3 border-l border-black/[.07] dark:border-white/[.07] space-y-0.5 pb-0.5">
+          {items.map(({ id, label, badge }) => {
+            const active = current === id;
+            return (
+              <button key={id} onClick={() => onNavigate(id)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl
+                            text-[13.5px] transition-colors
+                            ${active
+                              ? 'bg-accent-tint text-accent font-medium'
+                              : 'text-ink-soft dark:text-night-softText hover:bg-paper-soft dark:hover:bg-night-soft hover:text-ink dark:hover:text-night-text'}`}>
+                <span>{label}</span>
+                {badge && (
+                  <span className="text-[9.5px] font-semibold uppercase tracking-[.04em]
+                                   px-2 py-0.5 rounded-full
+                                   bg-paper-soft dark:bg-night-soft
+                                   text-ink-mute dark:text-night-softText">
+                    {badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Side menu (desktop + drawer móvil) ───────────────────
+function SideMenu({ current, onNavigate, open, onClose }) {
+  const main = NAV.filter(n => n.section === 'main');
+  const work = NAV.filter(n => n.section === 'work');
+
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === 'Escape') onClose && onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+
+  const navAnd = (id) => { onNavigate(id); onClose && onClose(); };
+
+  const groups = (handler) => (
+    <React.Fragment>
+      <NavGroup label="General" items={main} current={current} onNavigate={handler}/>
+      <div className="my-3 mx-3 h-px bg-black/[.06] dark:bg-white/[.06]"/>
+      <NavAccordion label="Salud"        Icon={IconHeart}   items={SALUD_SUBNAV} current={current} onNavigate={handler}/>
+      <NavAccordion label="Finanzas"     Icon={IconFinance} items={FIN_SUBNAV}   current={current} onNavigate={handler}/>
+      <NavAccordion label="Tiempo Libre" Icon={IconCinema}  items={TL_SUBNAV}    current={current} onNavigate={handler}/>
+      <div className="my-3 mx-3 h-px bg-black/[.06] dark:bg-white/[.06]"/>
+      <NavGroup label="Trabajo" items={work} current={current} onNavigate={handler}/>
+    </React.Fragment>
+  );
+
+  return (
+    <React.Fragment>
+      {/* Desktop — estático */}
+      <aside className="hidden md:flex flex-col w-60 lg:w-64 shrink-0 px-3 py-6 gap-1">
+        {groups(onNavigate)}
+      </aside>
+
+      {/* Móvil — drawer lateral */}
+      <div className={`md:hidden fixed inset-0 z-50 ${open ? '' : 'pointer-events-none'}`}
+           aria-hidden={!open}>
+        <div onClick={onClose}
+             className={`absolute inset-0 bg-black/40 transition-opacity duration-300
+                         ${open ? 'opacity-100' : 'opacity-0'}`}/>
+        <aside
+          role="dialog" aria-modal="true" aria-label="Menú de navegación"
+          className={`absolute left-0 top-0 bottom-0 w-72 max-w-[82vw]
+                      bg-paper dark:bg-night shadow-xl
+                      border-r border-black/[.06] dark:border-white/[.06]
+                      flex flex-col transition-transform duration-300 ease-out
+                      ${open ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="h-14 px-4 flex items-center justify-between shrink-0
+                          border-b border-black/[.05] dark:border-white/[.05]">
+            <div className="flex items-center gap-2.5">
+              <LettuceMark size={24}/>
+              <span className="text-[15px] font-medium tracking-tight text-ink dark:text-night-text">
+                Home Lettuce
+              </span>
+            </div>
+            <button onClick={onClose} aria-label="Cerrar menú"
+              className="h-9 w-9 rounded-full flex items-center justify-center
+                         text-ink-soft dark:text-night-softText
+                         hover:bg-paper-soft dark:hover:bg-night-soft transition-colors">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+                   strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+                <path d="m6 6 12 12M18 6 6 18"/>
+              </svg>
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-3 py-4">
+            {groups(navAnd)}
+          </div>
+        </aside>
+      </div>
+    </React.Fragment>
+  );
+}
+
 // ─── Bottom nav (mobile) ───────────────────────────────────
 function BottomNav({ current, onNavigate }) {
-  // 4 visibles + "Más"
   const visible = NAV.slice(0, 4);
   const overflow = NAV.slice(4);
   const [moreOpen, setMoreOpen] = React.useState(false);
-  const inOverflowActive = overflow.some(o => o.id === current);
+
+  const isOverflowActive = (id) => {
+    if (id === current) return true;
+    if (id === 'salud' && SALUD_IDS.has(current)) return true;
+    if (id === 'finanzas' && FIN_IDS.has(current)) return true;
+    return false;
+  };
+  const inOverflowActive = overflow.some(o => isOverflowActive(o.id));
 
   return (
     <React.Fragment>
@@ -288,7 +389,7 @@ function BottomNav({ current, onNavigate }) {
               Más
             </div>
             {overflow.map(({ id, label, Icon, href, external }) => {
-              const active = current === id;
+              const active = isOverflowActive(id);
               if (href) {
                 return (
                   <a key={id} href={href}
@@ -354,17 +455,23 @@ function AppShell({ username, email, hlUserId, onLogout }) {
   const [navOpen, setNavOpen] = React.useState(false);
 
   const renderRoute = () => {
-    if (route === 'inicio')     return <InicioDashboard username={username}/>;
-    if (route === 'calendario') return <CalendarPage/>;
-    if (route === 'tareas')     return <TareasPage/>;
-    if (route === 'habitos')    return <HabitosPage/>;
-    if (route === 'proyectos')  return <ProyectosPage/>;
-    if (route === 'cine')       return <CinePage/>;
-    if (route === 'finanzas')   return <FinanzasPage/>;
-    if (route === 'alimentacion') return <AlimentacionPage currentUserId={hlUserId}/>;
+    if (route === 'inicio')       return <InicioDashboard username={username} onNavigate={setRoute}/>;
+    if (route === 'calendario')   return <CalendarPage/>;
+    if (route === 'tareas')       return <TareasPage/>;
+    if (route === 'habitos')      return <HabitosPage/>;
+    if (route === 'proyectos')    return <ProyectosPage/>;
+    if (route === 'cine')         return <CinePage/>;
+    if (route === 'musica')       return <EmptyPage title="Música" subtitle="Tus playlists y colección musical · próximamente." icon={<IconMusic/>}/>;
     if (route === 'salud')        return <SaludPage onNavigate={setRoute}/>;
+    if (route === 'alimentacion') return <AlimentacionPage currentUserId={hlUserId}/>;
+    if (route === 'salud-fis')    return <EmptyPage title="Estado físico" subtitle="Actividad, descanso y energía día a día." icon={<IconBarbell/>}/>;
+    if (route === 'salud-con')    return <EmptyPage title="Consumo" subtitle="Seguimiento de consumo de azúcar, alcohol, pantallas y más." icon={<IconDroplet/>}/>;
+    if (route === 'salud-emo')    return <EmptyPage title="Emociones" subtitle="Registro de ánimo y salud mental." icon={<IconMoodHappy/>}/>;
+    if (FIN_IDS.has(route))       return <FinanzasPage/>;
     const meta = PAGE_META[route];
-    const Icon = (NAV.find(n => n.id === route) || {}).Icon || IconHome;
+    if (!meta) return <EmptyPage title={route} subtitle="" icon={<IconHome/>}/>;
+    const navItem = NAV.find(n => n.id === route);
+    const Icon = navItem ? navItem.Icon : IconHome;
     return <EmptyPage title={meta.title} subtitle={meta.subtitle} icon={<Icon/>}/>;
   };
 
@@ -409,17 +516,15 @@ function TweaksOverlay({ t, setTweak }) {
 
 // ─── Root ──────────────────────────────────────────────────
 function App() {
-  const [user, setUser] = React.useState(null); // null = no logueado
+  const [user, setUser] = React.useState(null);
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
 
-  // aplicar clase de paleta al <html>
   React.useEffect(() => {
     const root = document.documentElement;
     root.classList.remove('palette-sage','palette-lavender','palette-peach');
     root.classList.add('palette-' + (t.palette || 'sage'));
   }, [t.palette]);
 
-  // densidad: variable de espaciado
   React.useEffect(() => {
     const map = { compact: '.92', regular: '1', comfy: '1.1' };
     document.documentElement.style.setProperty('--hl-density', map[t.density] || '1');

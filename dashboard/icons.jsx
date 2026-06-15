@@ -186,6 +186,15 @@ const LettuceMark = ({ size = 28, className = "" }) => (
   </svg>
 );
 
+// ─── Tiempo Libre ───────────────────────────────────────────
+const IconMusic = (p) => (
+  <I {...p}>
+    <path d="M9 18V5l12-2v13"/>
+    <circle cx="6" cy="18" r="3"/>
+    <circle cx="18" cy="16" r="3"/>
+  </I>
+);
+
 // ─── Trabajo ────────────────────────────────────────────────
 const IconChartBar = (p) => (
   // gráfico de barras — panel / dashboard
@@ -202,6 +211,7 @@ Object.assign(window, {
   IconMore, IconSun, IconMoon, IconUser, IconLock, IconArrowRight, IconEye, IconEyeOff,
   IconGraduation, IconHabit, IconNote, IconHammer,
   IconHeart, IconBarbell, IconDroplet, IconMoodHappy,
+  IconMusic,
   IconChartBar,
   LettuceMark,
 });
