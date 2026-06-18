@@ -68,6 +68,17 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "density": "regular"
 }/*EDITMODE-END*/;
 
+const PALETTES = [
+  { value: 'sage',     label: 'Sage',     color: 'hsl(150,38%,76%)' },
+  { value: 'mint',     label: 'Mint',     color: 'hsl(172,48%,78%)' },
+  { value: 'sky',      label: 'Sky',      color: 'hsl(212,62%,83%)' },
+  { value: 'lavender', label: 'Lavender', color: 'hsl(265,45%,82%)' },
+  { value: 'rose',     label: 'Rose',     color: 'hsl(342,65%,84%)' },
+  { value: 'coral',    label: 'Coral',    color: 'hsl(8,75%,82%)'   },
+  { value: 'peach',    label: 'Peach',    color: 'hsl(22,78%,84%)'  },
+  { value: 'sand',     label: 'Sand',     color: 'hsl(42,72%,82%)'  },
+];
+
 function useDarkMode() {
   const read = () => {
     try {
@@ -101,7 +112,7 @@ const IconChevronDown = (p) => (
 );
 
 // ─── Header ────────────────────────────────────────────────
-function Header({ dark, onToggleDark, onLogout, username, email, onOpenNav }) {
+function Header({ dark, onToggleDark, onLogout, username, email, onOpenNav, palette, onPalette }) {
   return (
     <header className="sticky top-0 z-30 backdrop-blur-md
                        bg-paper/80 dark:bg-night/80
@@ -131,14 +142,15 @@ function Header({ dark, onToggleDark, onLogout, username, email, onOpenNav }) {
                        transition-colors">
             {dark ? <IconSun/> : <IconMoon/>}
           </button>
-          <UserMenu username={username} email={email} onLogout={onLogout}/>
+          <UserMenu username={username} email={email} onLogout={onLogout}
+                    palette={palette} onPalette={onPalette}/>
         </div>
       </div>
     </header>
   );
 }
 
-function UserMenu({ username, email, onLogout }) {
+function UserMenu({ username, email, onLogout, palette, onPalette }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
   React.useEffect(() => {
@@ -170,6 +182,22 @@ function UserMenu({ username, email, onLogout }) {
           </div>
           <div className="px-3 pb-2 text-[13px] text-ink dark:text-night-text truncate">
             {email || username}
+          </div>
+          <div className="h-px bg-black/[.06] dark:bg-white/[.06] my-1"/>
+          <div className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-[.08em] text-ink-mute dark:text-night-softText">
+            Paleta
+          </div>
+          <div className="px-3 pb-2.5 grid grid-cols-4 gap-2.5">
+            {PALETTES.map(({ value, label, color }) => (
+              <button key={value} title={label}
+                onClick={() => { onPalette(value); }}
+                style={{ background: color }}
+                className={`h-6 w-6 rounded-full transition-all
+                            ${palette === value
+                              ? 'ring-2 ring-offset-2 ring-black/25 dark:ring-white/35 scale-110'
+                              : 'hover:scale-110 ring-1 ring-black/10'}`}
+              />
+            ))}
           </div>
           <div className="h-px bg-black/[.06] dark:bg-white/[.06] my-1"/>
           <button onClick={onLogout}
@@ -449,7 +477,7 @@ function BottomNav({ current, onNavigate }) {
 }
 
 // ─── AppShell ──────────────────────────────────────────────
-function AppShell({ username, email, hlUserId, onLogout }) {
+function AppShell({ username, email, hlUserId, onLogout, palette, onPalette }) {
   const [route, setRoute] = React.useState('inicio');
   const [dark, setDark] = useDarkMode();
   const [navOpen, setNavOpen] = React.useState(false);
@@ -479,7 +507,8 @@ function AppShell({ username, email, hlUserId, onLogout }) {
     <div className="min-h-screen bg-paper dark:bg-night transition-colors">
       <Header dark={dark} onToggleDark={()=>setDark(d=>!d)}
               onLogout={onLogout} username={username} email={email}
-              onOpenNav={()=>setNavOpen(true)}/>
+              onOpenNav={()=>setNavOpen(true)}
+              palette={palette} onPalette={onPalette}/>
       <div className="flex">
         <SideMenu current={route} onNavigate={setRoute}
                   open={navOpen} onClose={()=>setNavOpen(false)}/>
@@ -501,7 +530,16 @@ function TweaksOverlay({ t, setTweak }) {
         <TweakRadio
           label="Color"
           value={t.palette}
-          options={['sage', 'lavender', 'peach']}
+          options={[
+            { value: 'sage',     label: 'Sage' },
+            { value: 'mint',     label: 'Mint' },
+            { value: 'sky',      label: 'Sky' },
+            { value: 'lavender', label: 'Lavender' },
+            { value: 'rose',     label: 'Rose' },
+            { value: 'coral',    label: 'Coral' },
+            { value: 'peach',    label: 'Peach' },
+            { value: 'sand',     label: 'Sand' },
+          ]}
           onChange={(v)=>setTweak('palette', v)}/>
         <TweakSection label="Densidad"/>
         <TweakRadio
@@ -521,7 +559,7 @@ function App() {
 
   React.useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('palette-sage','palette-lavender','palette-peach');
+    root.classList.remove('palette-sage','palette-lavender','palette-peach','palette-sky','palette-rose','palette-sand','palette-mint','palette-coral');
     root.classList.add('palette-' + (t.palette || 'sage'));
   }, [t.palette]);
 
@@ -533,7 +571,8 @@ function App() {
   return (
     <React.Fragment>
       {user
-        ? <AppShell username={user.name} email={user.email} hlUserId={user.hlUserId} onLogout={()=>setUser(null)}/>
+        ? <AppShell username={user.name} email={user.email} hlUserId={user.hlUserId} onLogout={()=>setUser(null)}
+                    palette={t.palette} onPalette={(v)=>setTweak('palette', v)}/>
         : <LoginPage onLogin={(u)=>setUser(u)}/>}
       <TweaksOverlay t={t} setTweak={setTweak}/>
     </React.Fragment>
